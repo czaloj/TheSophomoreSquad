@@ -2,6 +2,7 @@ package game;
 
 import blister.GameTime;
 import egl.math.Vector2;
+import org.lwjgl.opengl.GL11;
 
 /**
  * \brief
@@ -49,6 +50,7 @@ public class GameplayScreen extends blister.GameScreen {
     }
     @Override
     public void draw(GameTime gameTime) {
-        // Empty
+        GL11.glClearColor(1.0f, 1.0f, 0.0f, 0.0f);
+        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
     }
 }
