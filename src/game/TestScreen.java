@@ -3,13 +3,14 @@ package game;
 import blister.GameScreen;
 import blister.GameTime;
 import egl.*;
-import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.*;
 
 /**
  * \brief
  */
 public class TestScreen extends GameScreen {
     private GLProgram program;
+    private int vao;
 
     @Override
     public int getNext() {
@@ -34,6 +35,8 @@ public class TestScreen extends GameScreen {
         program = new GLProgram(true);
         program.quickCreateResource("TestDraw", "game/graphics/shaders/fullscreen.vert", "game/graphics/shaders/simpleout.glsl", null);
 
+        // Create a super dummy VAO
+        vao = GL30.glGenVertexArrays();
     }
     @Override
     public void destroy(GameTime gameTime) {
@@ -61,9 +64,8 @@ public class TestScreen extends GameScreen {
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
 
         program.use();
+        GL30.glBindVertexArray(vao); // THIS VAO IS NECESSARY TO DRAW STUFF EVEN THOUGH IT HAS NO DATA
         GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, 3);
         GLProgram.unuse();
-
-        GLError.get("Drawing Error");
     }
 }
