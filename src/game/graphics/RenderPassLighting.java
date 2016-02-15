@@ -14,8 +14,11 @@ import egl.math.Color;
 import egl.math.Vector2;
 import ext.java.IOUtils;
 import game.GameSettings;
+import jdk.nashorn.internal.objects.NativeObject;
+import org.lwjgl.Sys;
 
 import java.io.BufferedReader;
+import java.nio.ByteBuffer;
 
 /**
  * \brief
@@ -70,16 +73,35 @@ public class RenderPassLighting {
 
         // Build the texture
         texLight.init();
-        texLight.setImage(width, height, GL_RGBA, GL_UNSIGNED_BYTE, null, false);
+        ByteBuffer bb = NativeMem.createByteBuffer(4 * width * height);
+        int count = 0;
+        for (int i = 0; i < width * height; i++) {
+            if (Math.random() > 0.8) {
+                count++;
+                bb.put((byte)~0);
+            }
+            else {
+                bb.put((byte)0);
+            }
+
+            bb.put((byte)0);
+            bb.put((byte)0);
+            bb.put((byte)0);
+        }
+        bb.flip();
+        System.out.println("Count: " + count);
+        texLight.setImage(width, height, GL_RGBA, GL_UNSIGNED_BYTE, bb, false);
     }
 
-    public void draw() {
-        progLighting.use();
-        glUniform1i(progLighting.getUniform("unTexture"), 0);
-        glBindImageTexture(0, texLight.getID(), 0, false, 0, GL_READ_WRITE, GL_RGBA8);
-        glDispatchCompute(16, 16, 1);
-        glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-        glBindImageTexture(0, 0, 0, false, 0, GL_READ_WRITE, GL_RGBA8);
+    public void draw(boolean sim) {
+        if (sim) {
+            progLighting.use();
+            glUniform1i(progLighting.getUniform("unTexture"), 0);
+            glBindImageTexture(0, texLight.getID(), 0, false, 0, GL_READ_WRITE, GL_RGBA8);
+            glDispatchCompute(texLight.getWidth() / 16, texLight.getHeight() / 16, 1);
+            glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+            glBindImageTexture(0, 0, 0, false, 0, GL_READ_WRITE, GL_RGBA8);
+        }
 
         progSimple.use();
         texLight.bindToUnit(GL_TEXTURE0);

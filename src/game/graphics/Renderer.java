@@ -4,7 +4,11 @@ package game.graphics;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL30.*;
 
+import blister.input.KeyboardEventDispatcher;
+import blister.input.KeyboardKeyEventArgs;
 import egl.NativeMem;
+import ext.csharp.ACEventFunc;
+import org.lwjgl.input.Keyboard;
 
 import java.nio.IntBuffer;
 
@@ -15,6 +19,7 @@ import java.nio.IntBuffer;
 public class Renderer {
     private int fboRender = 0;
     private int fboLighting = 0;
+    private boolean sim = false;
 
     private final RenderPassLighting passLighting = new RenderPassLighting();
 
@@ -24,6 +29,13 @@ public class Renderer {
 
     public void init() {
         passLighting.init();
+
+        KeyboardEventDispatcher.OnKeyPressed.add(new ACEventFunc<KeyboardKeyEventArgs>() {
+            @Override
+            public void receive(Object sender, KeyboardKeyEventArgs args) {
+                if (args.key == Keyboard.KEY_SPACE) sim = true;
+            }
+        });
     }
     public void dispose() {
         passLighting.dispose();
@@ -51,6 +63,7 @@ public class Renderer {
     }
 
     public void draw() {
-        passLighting.draw();
+        passLighting.draw(sim);
+        if (sim) sim = false;
     }
 }
