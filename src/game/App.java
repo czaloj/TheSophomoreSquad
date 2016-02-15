@@ -1,13 +1,15 @@
 package game;
 
 import blister.ScreenList;
+import org.lwjgl.opengl.ContextAttribs;
+import org.lwjgl.opengl.PixelFormat;
 
 /**
  * \brief
  */
 public class App extends blister.MainGame {
     public App(String title, int w, int h) {
-        super(title, w, h);
+        super(title, w, h, new ContextAttribs(4, 3), new PixelFormat());
     }
 
     @Override
