@@ -1,5 +1,3 @@
-#version 430
-
 uniform sampler2D unTexture;
 
 in vec2 fUV;

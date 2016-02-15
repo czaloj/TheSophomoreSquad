@@ -1,10 +1,31 @@
-#version 430
+#define GROUP_SIZE 16
+#define MAX_BLUR_DISTANCE 8
 
-layout(rgba8) uniform image2D unTexture;
+layout(rgb16f) uniform image2D unTexture;
+uniform int unBlurDistance;
+uniform float unBlurWeights[MAX_BLUR_DISTANCE];
 
-layout (local_size_x = 16, local_size_y = 16) in;
+shared vec3 shAccumulationAmounts[GROUP_SIZE * GROUP_SIZE];
+
+layout (local_size_x = GROUP_SIZE, local_size_y = GROUP_SIZE) in;
 void main() {
     ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+
+    // Vertical Blur
+    vec3 accum = unBlurWeights[0] * imageLoad(unTexture, uv);
+    for (int i = 1; i < unBlurDistance; i++) {
+        accum += unBlurWeights[i] * (imageLoad(unTexture, uv + ivec2(0, i)) + imageLoad(unTexture, uv - ivec2(0, i)));
+    }
+    shAccumulationAmounts[gl_LocalInvocationIndex] = accum;
+    barrier();
+
+    // Horizontal Blur
+    accum *= unBlurWeights[0];
+    for (int i = 1; i < unBlurDistance; i++) {
+        accum += unBlurWeights[i] * (imageLoad(unTexture, uv + ivec2(0, i)) + imageLoad(unTexture, uv - ivec2(0, i)));
+    }
+    shAccumulationAmounts[gl_LocalInvocationIndex] = accum;
+
 
     // Load data
     vec4 data = imageLoad(unTexture, uv);

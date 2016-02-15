@@ -1,5 +1,3 @@
-#version 430
-
 out vec2 fUV;
 
 // Merci to Cort Stratton for the quick trick

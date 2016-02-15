@@ -139,7 +139,7 @@ public class GLProgram implements IDisposable {
                 throw new Exception("Shader Type Is Not Supported");
         }
         int idS = glCreateShader(st);
-        glShaderSource(idS, src);
+        glShaderSource(idS, "#version 430\n" + src);
         GLError.get(st + " Source");
         glCompileShader(idS);
         GLError.get(st + " Compile");

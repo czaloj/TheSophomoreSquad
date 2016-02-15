@@ -2,51 +2,87 @@ package game.graphics;
 
 // Import all OpenGL functions
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL12.*;
 import static org.lwjgl.opengl.GL13.*;
+import static org.lwjgl.opengl.GL14.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
+import static org.lwjgl.opengl.GL21.*;
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.opengl.GL42.*;
 import static org.lwjgl.opengl.GL43.*;
 
+import blister.input.KeyboardEventDispatcher;
+import blister.input.KeyboardKeyEventArgs;
 import egl.*;
-import egl.math.Color;
-import egl.math.Vector2;
+import ext.csharp.ACEventFunc;
 import ext.java.IOUtils;
 import game.GameSettings;
-import jdk.nashorn.internal.objects.NativeObject;
-import org.lwjgl.Sys;
+import org.lwjgl.input.Keyboard;
 
 import java.io.BufferedReader;
 import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 
 /**
  * \brief
  */
 public class RenderPassLighting {
     private static final int QUALITY_LEVEL_FULL_RESOLUTION = 2;
-    private static final String SHADER_FILE_LIGHTING = "game/graphics/shaders/LightingPostProcess.glsl";
+    private static final String SHADER_FILE_LIGHTING = "game/graphics/shaders/GaussianBlur.glsl";
 
     private GLTexture texLight = new GLTexture(GL.TextureTarget.Texture2D, false);
-    private GLProgram progLighting = new GLProgram(false);
+    private GLTexture texLightBuffer = new GLTexture(GL.TextureTarget.Texture2D, false);
+    private GLProgram progBlurVertical = new GLProgram(false);
+    private GLProgram progBlurHorizontal = new GLProgram(false);
     private GLProgram progSimple = new GLProgram(false);
     private int dummyVAO;
+    boolean drawn = true;
 
     public RenderPassLighting() {
         // Empty
     }
 
     public void init() {
+        KeyboardEventDispatcher.OnKeyPressed.add(new ACEventFunc<KeyboardKeyEventArgs>() {
+            @Override
+            public void receive(Object sender, KeyboardKeyEventArgs args) {
+                if(args.key == Keyboard.KEY_SPACE) drawn = false;
+            }
+        });
+
         // Create the target
         generateTexture();
 
-        // Load the compute shader
+        // Load the compute shaders
         BufferedReader reader = IOUtils.openReaderResource(SHADER_FILE_LIGHTING);
         String src = IOUtils.readFull(reader);
         int shader = glCreateShader(GL_COMPUTE_SHADER);
-        glShaderSource(shader, src);
+        glShaderSource(shader, "#version 430\n" + src);
         glCompileShader(shader);
-        progLighting.quickCreateShaderCompute("Lighting Post Process", shader);
+        progBlurHorizontal.quickCreateShaderCompute("Light Blur Horizontal", shader);
+        shader = glCreateShader(GL_COMPUTE_SHADER);
+        glShaderSource(shader, "#version 430\n#define VERTICAL\n" + src);
+        glCompileShader(shader);
+        progBlurVertical.quickCreateShaderCompute("Light Blur Vertical", shader);
+
+        // Set uniforms
+        FloatBuffer fbWeights = NativeMem.createFloatBuffer(8);
+        fbWeights.put(new float[] { 0.5f, 0.2f, 0.05f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f });
+        fbWeights.flip();
+
+        progBlurHorizontal.use();
+        glUniform1i(progBlurHorizontal.getUniform("unTexture"), 0);
+        glUniform1i(progBlurHorizontal.getUniform("unTextureDest"), 1);
+        glUniform1i(progBlurHorizontal.getUniform("unBlurDistance"), 2);
+        glUniform1(progBlurHorizontal.getUniformArray("unBlurWeights"), fbWeights);
+        fbWeights.rewind();
+        progBlurVertical.use();
+        glUniform1i(progBlurVertical.getUniform("unTexture"), 1);
+        glUniform1i(progBlurVertical.getUniform("unTextureDest"), 0);
+        glUniform1i(progBlurVertical.getUniform("unBlurDistance"), 2);
+        glUniform1(progBlurVertical.getUniformArray("unBlurWeights"), fbWeights);
+        GLProgram.unuse();
 
         // Visibility testing
         progSimple.quickCreateResource("Quick Render", "game/graphics/shaders/fullscreen.glsl", "game/graphics/shaders/composite.glsl", null);
@@ -58,7 +94,7 @@ public class RenderPassLighting {
     }
     public void dispose() {
         texLight.dispose();
-        progLighting.dispose();
+        progBlurHorizontal.dispose();
     }
 
     private void generateTexture() {
@@ -72,6 +108,7 @@ public class RenderPassLighting {
         }
 
         // Build the texture
+        texLight.internalFormat = GL_RGBA16F;
         texLight.init();
         ByteBuffer bb = NativeMem.createByteBuffer(4 * width * height);
         int count = 0;
@@ -86,21 +123,31 @@ public class RenderPassLighting {
 
             bb.put((byte)0);
             bb.put((byte)0);
-            bb.put((byte)0);
+            bb.put((byte)~0);
         }
         bb.flip();
         System.out.println("Count: " + count);
         texLight.setImage(width, height, GL_RGBA, GL_UNSIGNED_BYTE, bb, false);
+
+        texLightBuffer.internalFormat = GL_RGBA16F;
+        texLightBuffer.init();
+        texLightBuffer.setImage(width, height, GL_RGBA, GL_UNSIGNED_BYTE, (ByteBuffer)null, false);
     }
 
-    public void draw(boolean sim) {
-        if (sim) {
-            progLighting.use();
-            glUniform1i(progLighting.getUniform("unTexture"), 0);
-            glBindImageTexture(0, texLight.getID(), 0, false, 0, GL_READ_WRITE, GL_RGBA8);
+    public void draw() {
+        if (!drawn) {
+            drawn = true;
+            glBindImageTexture(0, texLight.getID(), 0, false, 0, GL_READ_WRITE, GL_RGBA16F);
+            glBindImageTexture(1, texLightBuffer.getID(), 0, false, 0, GL_READ_WRITE, GL_RGBA16F);
+
+            progBlurHorizontal.use();
             glDispatchCompute(texLight.getWidth() / 16, texLight.getHeight() / 16, 1);
             glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-            glBindImageTexture(0, 0, 0, false, 0, GL_READ_WRITE, GL_RGBA8);
+            progBlurVertical.use();
+            glDispatchCompute(texLight.getWidth() / 16, texLight.getHeight() / 16, 1);
+            glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+            glBindImageTexture(0, 0, 0, false, 0, GL_READ_WRITE, GL_RGBA16F);
+            glBindImageTexture(1, 0, 0, false, 0, GL_READ_WRITE, GL_RGBA16F);
         }
 
         progSimple.use();

@@ -1,5 +1,3 @@
-#version 430
-
 in vec2 fUV;
 
 out vec4 pColor;
