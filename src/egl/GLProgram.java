@@ -351,7 +351,36 @@ public class GLProgram implements IDisposable {
         initUniforms();
         return this;
     }
-    
+    public GLProgram quickCreateShaderCompute(String materialName, int idS) {
+        init();
+        try {
+            if(getIsLinked()) throw new Exception("Program Is Already Linked");
+
+            // Check Status
+            int status = glGetShaderi(idS, ShaderParameter.CompileStatus);
+            if(status != 1) {
+                String errorMsg = "Shader Compilation Error for " + materialName + " material:\r\n" + GL20.glGetShaderInfoLog(idS, 1024);
+                GLDiagnostic.writeln(errorMsg);
+                System.err.println(errorMsg);
+                glDeleteShader(idS);
+                throw new Exception("Shader Had Compilation Errors");
+            }
+
+            glAttachShader(id, idS);
+            idFS = idS;
+            GLError.get("Compute Attach");
+
+            link(materialName);
+        }
+        catch(Exception e) {
+            System.err.println(e.getMessage());
+            return this;
+        }
+        initUniforms();
+        return this;
+    }
+
+
     public void printUniforms() {
     	System.out.println(uniforms);
     }
