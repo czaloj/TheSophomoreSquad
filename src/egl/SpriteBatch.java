@@ -110,16 +110,16 @@ public class SpriteBatch implements IDisposable {
 	 * Vertex Shader Source Code
 	 */
 	private static final String VS_SRC = 
-			"#version 120\n" +
+			"#version 430\n" +
 			"uniform mat4 World;\n" + 
 			"uniform mat4 VP;\n" + 
-			"attribute vec4 vPosition;\n" + 
-			"attribute vec2 vUV;\n" + 
-			"attribute vec4 vUVRect;\n" + 
-			"attribute vec4 vTint;\n" + 
-			"varying vec2 fUV;\n" + 
-			"varying vec4 fUVRect;\n" + 
-			"varying vec4 fTint;\n" + 
+			"in vec4 vPosition;\n" +
+			"in vec2 vUV;\n" +
+			"in vec4 vUVRect;\n" +
+			"in vec4 vTint;\n" +
+			"out vec2 fUV;\n" +
+			"out vec4 fUVRect;\n" +
+			"out vec4 fTint;\n" +
 			"void main() {\n" + 
 			"    fTint = vTint;\n" + 
 			"    fUV = vUV;\n" + 
@@ -131,15 +131,16 @@ public class SpriteBatch implements IDisposable {
 	 * Fragment Shader Source Code
 	 */
 	private static final String FS_SRC = 
-			"#version 120\n" +
+			"#version 430\n" +
 			"uniform sampler2D SBTex;\n" + 
 			"uniform vec4 ColorMult;\n" + 
 			"uniform vec4 ColorAdd;\n" + 
-			"varying vec2 fUV;\n" + 
-			"varying vec4 fUVRect;\n" + 
-			"varying vec4 fTint;\n" + 
-			"void main() {\n" + 
-			"    gl_FragColor = (ColorMult * texture2D(SBTex, (vec2(fract(fUV.x), fract(fUV.y)) * fUVRect.zw) + fUVRect.xy) * fTint) + ColorAdd;\n" + 
+			"in vec2 fUV;\n" +
+			"in vec4 fUVRect;\n" +
+			"in vec4 fTint;\n" +
+			"out vec4 pColor;\n" +
+			"void main() {\n" +
+			"    pColor = (ColorMult * texture2D(SBTex, (vec2(fract(fUV.x), fract(fUV.y)) * fUVRect.zw) + fUVRect.xy) * fTint) + ColorAdd;\n" +
 			"}";
 
 	/**
