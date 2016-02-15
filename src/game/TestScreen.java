@@ -33,7 +33,7 @@ public class TestScreen extends GameScreen {
     @Override
     public void build() {
         program = new GLProgram(true);
-        program.quickCreateResource("TestDraw", "game/graphics/shaders/fullscreen.vert", "game/graphics/shaders/simpleout.glsl", null);
+        program.quickCreateResource("TestDraw", "game/graphics/shaders/fullscreen.glsl", "game/graphics/shaders/simpleout.glsl", null);
 
         // Create a super dummy VAO
         vao = GL30.glGenVertexArrays();

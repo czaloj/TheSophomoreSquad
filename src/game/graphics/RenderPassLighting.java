@@ -2,32 +2,20 @@ package game.graphics;
 
 // Import all OpenGL functions
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL12.*;
 import static org.lwjgl.opengl.GL13.*;
-import static org.lwjgl.opengl.GL14.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL21.*;
 import static org.lwjgl.opengl.GL30.*;
-import static org.lwjgl.opengl.GL31.*;
-import static org.lwjgl.opengl.GL32.*;
-import static org.lwjgl.opengl.GL33.*;
-import static org.lwjgl.opengl.GL40.*;
-import static org.lwjgl.opengl.GL41.*;
 import static org.lwjgl.opengl.GL42.*;
 import static org.lwjgl.opengl.GL43.*;
-import static org.lwjgl.opengl.GL44.*;
 
 import egl.*;
 import egl.math.Color;
-import egl.math.Matrix4;
 import egl.math.Vector2;
 import ext.java.IOUtils;
 import game.GameSettings;
-import org.ietf.jgss.GSSManager;
 
 import java.io.BufferedReader;
-import java.nio.IntBuffer;
 
 /**
  * \brief
@@ -39,11 +27,10 @@ public class RenderPassLighting {
     private GLTexture texLight = new GLTexture(GL.TextureTarget.Texture2D, false);
     private GLProgram progLighting = new GLProgram(false);
     private GLProgram progSimple = new GLProgram(false);
-
-    SpriteBatch batch;
+    private int dummyVAO;
 
     public RenderPassLighting() {
-
+        // Empty
     }
 
     public void init() {
@@ -58,21 +45,17 @@ public class RenderPassLighting {
         glCompileShader(shader);
         progLighting.quickCreateShaderCompute("Lighting Post Process", shader);
 
-        progSimple.quickCreateResource("Quick Render", "game/graphics/shaders/fullscreen.vert", "game/graphics/shaders/composite.frag", null);
+        // Visibility testing
+        progSimple.quickCreateResource("Quick Render", "game/graphics/shaders/fullscreen.glsl", "game/graphics/shaders/composite.glsl", null);
         progSimple.use();
-//        glUniform1i(progSimple.getUniform("unTexture"), 0);
+        glUniform1i(progSimple.getUniform("unTexture"), 0);
         GLProgram.unuse();
 
-        batch = new SpriteBatch(true);
-        batch.begin();
-        batch.draw(texLight, new Vector2(0, 0), new Vector2(100, 100), Color.White, 0.0f);
-        batch.end(SpriteSortMode.None);
+        dummyVAO = glGenVertexArrays();
     }
     public void dispose() {
         texLight.dispose();
         progLighting.dispose();
-
-        batch.dispose();
     }
 
     private void generateTexture() {
@@ -100,13 +83,8 @@ public class RenderPassLighting {
 
         progSimple.use();
         texLight.bindToUnit(GL_TEXTURE0);
+        glBindVertexArray(dummyVAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
         GLProgram.unuse();
-        GLError.get("Drawing Batch");
-
-
-//        batch.renderBatch(SpriteBatch.createCameraFromWindow(GameSettings.global.resolutionWidth, GameSettings.global.resolutionHeight), new Matrix4(), null, null, null, null);
-//        GLError.get("Drawing Batch");
     }
-
 }

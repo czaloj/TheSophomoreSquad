@@ -14,7 +14,7 @@ public class App extends blister.MainGame {
 
     @Override
     protected void buildScreenList() {
-        screenList = new ScreenList(this, 1,
+        screenList = new ScreenList(this, 0,
             new GameplayScreen(),
             new TestScreen()
         );
