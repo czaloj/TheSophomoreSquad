@@ -1,13 +1,19 @@
 package game;
 
 import blister.GameTime;
+import egl.BlendState;
+import egl.DepthState;
+import egl.RasterizerState;
 import egl.math.Vector2;
+import game.graphics.Renderer;
 import org.lwjgl.opengl.GL11;
 
 /**
  * \brief
  */
 public class GameplayScreen extends blister.GameScreen {
+    private final Renderer renderer = new Renderer();
+
     @Override
     public int getNext() {
         return 0;
@@ -28,11 +34,11 @@ public class GameplayScreen extends blister.GameScreen {
 
     @Override
     public void build() {
-        // Empty
+        renderer.init();
     }
     @Override
     public void destroy(GameTime gameTime) {
-        // Empty
+        renderer.dispose();
     }
 
     @Override
@@ -50,7 +56,13 @@ public class GameplayScreen extends blister.GameScreen {
     }
     @Override
     public void draw(GameTime gameTime) {
-        GL11.glClearColor(1.0f, 1.0f, 0.0f, 0.0f);
-        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
+        GL11.glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
+        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+        BlendState.OPAQUE.set();
+        DepthState.NONE.set();
+        RasterizerState.CULL_NONE.set();
+        GL11.glViewport(0, 0, 1280, 720);
+
+        renderer.draw();
     }
 }
