@@ -2,12 +2,9 @@ package game.graphics;
 
 // Import all OpenGL functions
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL12.*;
 import static org.lwjgl.opengl.GL13.*;
-import static org.lwjgl.opengl.GL14.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL21.*;
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.opengl.GL42.*;
 import static org.lwjgl.opengl.GL43.*;
@@ -55,16 +52,8 @@ public class RenderPassLighting {
         generateTexture();
 
         // Load the compute shaders
-        BufferedReader reader = IOUtils.openReaderResource(SHADER_FILE_LIGHTING);
-        String src = IOUtils.readFull(reader);
-        int shader = glCreateShader(GL_COMPUTE_SHADER);
-        glShaderSource(shader, "#version 430\n" + src);
-        glCompileShader(shader);
-        progBlurHorizontal.quickCreateShaderCompute("Light Blur Horizontal", shader);
-        shader = glCreateShader(GL_COMPUTE_SHADER);
-        glShaderSource(shader, "#version 430\n#define VERTICAL\n" + src);
-        glCompileShader(shader);
-        progBlurVertical.quickCreateShaderCompute("Light Blur Vertical", shader);
+        progBlurHorizontal.setHeader(4, 3).quickCreateComputeResource("Light Blur Horizontal", SHADER_FILE_LIGHTING);
+        progBlurVertical.setHeader(4, 3, "VERTICAL").quickCreateComputeResource("Light Blur Horizontal", SHADER_FILE_LIGHTING);
 
         // Set uniforms
         FloatBuffer fbWeights = NativeMem.createFloatBuffer(8);
@@ -142,10 +131,10 @@ public class RenderPassLighting {
 
             progBlurHorizontal.use();
             glDispatchCompute(texLight.getWidth() / 16, texLight.getHeight() / 16, 1);
-            glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
             progBlurVertical.use();
             glDispatchCompute(texLight.getWidth() / 16, texLight.getHeight() / 16, 1);
             glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+
             glBindImageTexture(0, 0, 0, false, 0, GL_READ_WRITE, GL_RGBA16F);
             glBindImageTexture(1, 0, 0, false, 0, GL_READ_WRITE, GL_RGBA16F);
         }

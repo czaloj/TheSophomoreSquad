@@ -20,6 +20,7 @@ import static org.lwjgl.opengl.GL20.glUseProgram;
 import static org.lwjgl.opengl.GL20.glValidateProgram;
 
 import java.io.BufferedReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.regex.MatchResult;
@@ -34,7 +35,12 @@ import egl.GL.ShaderType;
 import ext.java.IOUtils;
 
 public class GLProgram implements IDisposable {
-    private static final String GLSL_VERSION_TAG = "#version 430\n";
+    private static final int SHADER_INDEX_VERTEX = 0;
+    private static final int SHADER_INDEX_GEOMETRY = 1;
+    private static final int SHADER_INDEX_TESSELATION_CONTROL = 2;
+    private static final int SHADER_INDEX_TESSELATION_EVALUATION = 3;
+    private static final int SHADER_INDEX_FRAGMENT = 4;
+    private static final int SHADER_INDEX_COMPUTE = 5;
 
 	private static final String NON_ALLOWABLE_PREFIX = "gl_";
     private static final Pattern RGX_SEMANTIC = Pattern.compile(
@@ -51,9 +57,11 @@ public class GLProgram implements IDisposable {
         glUseProgram(0);
     }
     
-    private int id, idVS, idFS;
+    private int id;
+    private final ArrayList<Integer> idShaders = new ArrayList<>();
     private boolean isLinked;
 
+    private String header;
     private final HashMap<String, Integer> uniforms = new HashMap<>();
     private final HashMap<String, Integer> attributes = new HashMap<>();
     public final HashMap<Integer, Integer> semanticLinks = new HashMap<>();
@@ -61,11 +69,11 @@ public class GLProgram implements IDisposable {
     
     public GLProgram(boolean init) {
         id = 0;
-        idFS = 0;
-        idVS = 0;
 
         if(init) init();
         isLinked = false;
+
+        setHeader(4, 3);
     }
     public GLProgram() {
     	this(false);
@@ -73,25 +81,27 @@ public class GLProgram implements IDisposable {
     @Override
     public void dispose() {
         if(!getIsCreated()) return;
-
         if(getIsInUse()) unuse();
-        if(idVS != 0) {
-        	glDetachShader(id, idVS);
-            glDeleteShader(idVS);
-            idVS = 0;
+
+        // Delete objects
+        for (int idS : idShaders) {
+            glDetachShader(id, idS);
+            glDeleteShader(idS);
         }
-        if(idFS != 0) {
-        	glDetachShader(id, idFS);
-            glDeleteShader(idFS);
-            idFS = 0;
-        }
-        
         glDeleteProgram(id);
 
         // Reset Internal State
         id = 0;
         isLinked = false;
         if(getIsInUse()) unuse();
+    }
+
+    public GLProgram setHeader(int majorVersion, int minorVersion, String... defines) {
+        header = String.format("#version %d%d0\n", majorVersion, minorVersion);
+        for (int i = 0; i < defines.length; i++) {
+            header += "#define " + defines[i] + "\n";
+        }
+        return this;
     }
 
     public int getID() {
@@ -128,20 +138,8 @@ public class GLProgram implements IDisposable {
     public void addShader(String materialName, int st, String src) throws Exception {
         if(getIsLinked()) throw new Exception("Program Is Already Linked");
 
-        switch(st) {
-            case ShaderType.VertexShader:
-                if(idVS != 0)
-                    throw new Exception("Attempting To Add Another Vertex Shader To Program");
-                break;
-            case ShaderType.FragmentShader:
-                if(idFS != 0)
-                    throw new Exception("Attempting To Add Another Fragment Shader To Program");
-                break;
-            default:
-                throw new Exception("Shader Type Is Not Supported");
-        }
         int idS = glCreateShader(st);
-        glShaderSource(idS, GLSL_VERSION_TAG + src);
+        glShaderSource(idS, header + src);
         GLError.get(st + " Source");
         glCompileShader(idS);
         GLError.get(st + " Compile");
@@ -156,8 +154,10 @@ public class GLProgram implements IDisposable {
             throw new Exception("Shader Had Compilation Errors");
         }
 
+        // Add the shader to the program
         glAttachShader(id, idS);
         GLError.get(st + " Attach");
+        idShaders.add(idS);
 
         // If It's A Vertex Shader -> Get Semantics From Source
         if(st == ShaderType.VertexShader) {
@@ -182,11 +182,6 @@ public class GLProgram implements IDisposable {
                 sem |= index;
                 foundSemantics.put(attr, sem);
             }
-        }
-
-        switch(st) {
-            case ShaderType.VertexShader: idVS = idS; break;
-            case ShaderType.FragmentShader: idFS = idS; break;
         }
     }
     public void addShaderFile(String materialName, int st, String file) throws Exception {
@@ -353,25 +348,10 @@ public class GLProgram implements IDisposable {
         initUniforms();
         return this;
     }
-    public GLProgram quickCreateShaderCompute(String materialName, int idS) {
+    public GLProgram quickCreateCompute(String materialName, String csFile) {
         init();
         try {
-            if(getIsLinked()) throw new Exception("Program Is Already Linked");
-
-            // Check Status
-            int status = glGetShaderi(idS, ShaderParameter.CompileStatus);
-            if(status != 1) {
-                String errorMsg = "Shader Compilation Error for " + materialName + " material:\r\n" + GL20.glGetShaderInfoLog(idS, 1024);
-                GLDiagnostic.writeln(errorMsg);
-                System.err.println(errorMsg);
-                glDeleteShader(idS);
-                throw new Exception("Shader Had Compilation Errors");
-            }
-
-            glAttachShader(id, idS);
-            idFS = idS;
-            GLError.get("Compute Attach");
-
+            addShaderFile(materialName, ShaderType.ComputeShader, csFile);
             link(materialName);
         }
         catch(Exception e) {
@@ -381,7 +361,32 @@ public class GLProgram implements IDisposable {
         initUniforms();
         return this;
     }
-
+    public GLProgram quickCreateComputeSource(String materialName, String csSrc) {
+        init();
+        try {
+            addShader(materialName, ShaderType.ComputeShader, csSrc);
+            link(materialName);
+        }
+        catch(Exception e) {
+            System.err.println(e.getMessage());
+            return this;
+        }
+        initUniforms();
+        return this;
+    }
+    public GLProgram quickCreateComputeResource(String materialName, String csRes) {
+        init();
+        try {
+            addShaderResource(materialName, ShaderType.ComputeShader, csRes);
+            link(materialName);
+        }
+        catch(Exception e) {
+            System.err.println(e.getMessage());
+            return this;
+        }
+        initUniforms();
+        return this;
+    }
 
     public void printUniforms() {
     	System.out.println(uniforms);
