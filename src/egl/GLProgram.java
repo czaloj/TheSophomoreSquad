@@ -34,6 +34,8 @@ import egl.GL.ShaderType;
 import ext.java.IOUtils;
 
 public class GLProgram implements IDisposable {
+    private static final String GLSL_VERSION_TAG = "#version 430\n";
+
 	private static final String NON_ALLOWABLE_PREFIX = "gl_";
     private static final Pattern RGX_SEMANTIC = Pattern.compile(
         "(\\w+)\\s*;\\s*//\\s*sem\\s*\\x28\\s*(\\w+)\\s*(\\d+)\\s*\\x29\\s*$",
@@ -139,7 +141,7 @@ public class GLProgram implements IDisposable {
                 throw new Exception("Shader Type Is Not Supported");
         }
         int idS = glCreateShader(st);
-        glShaderSource(idS, "#version 430\n" + src);
+        glShaderSource(idS, GLSL_VERSION_TAG + src);
         GLError.get(st + " Source");
         glCompileShader(idS);
         GLError.get(st + " Compile");
