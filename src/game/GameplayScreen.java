@@ -6,6 +6,8 @@ import egl.DepthState;
 import egl.RasterizerState;
 import egl.math.Vector2;
 import game.graphics.Renderer;
+import game.logic.GameState;
+import game.logic.GameplayController;
 import org.lwjgl.opengl.GL11;
 
 /**
@@ -13,6 +15,9 @@ import org.lwjgl.opengl.GL11;
  */
 public class GameplayScreen extends blister.GameScreen {
     private final Renderer renderer = new Renderer();
+    private GameState state;
+    private final GameplayController gameplayController = new GameplayController();
+
 
     @Override
     public int getNext() {
@@ -44,6 +49,8 @@ public class GameplayScreen extends blister.GameScreen {
     @Override
     public void onEntry(GameTime gameTime) {
         // Empty
+        state = GlobalState.instance.state;
+        gameplayController.init(state);
     }
     @Override
     public void onExit(GameTime gameTime) {
@@ -52,7 +59,8 @@ public class GameplayScreen extends blister.GameScreen {
 
     @Override
     public void update(GameTime gameTime) {
-        // Empty
+        // TODO: Use fixed time step
+        gameplayController.update((float)gameTime.elapsed);
     }
     @Override
     public void draw(GameTime gameTime) {

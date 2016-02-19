@@ -8,16 +8,24 @@ import org.lwjgl.opengl.PixelFormat;
  * \brief
  */
 public class App extends blister.MainGame {
+    public GameplayScreen gameplayScreen;
+    public MenuScreen menuScreen;
+
     public App(String title, int w, int h) {
         super(title, w, h, new ContextAttribs(4, 3), new PixelFormat());
     }
 
     @Override
     protected void buildScreenList() {
+        gameplayScreen = new GameplayScreen();
+        menuScreen = new MenuScreen();
+
         screenList = new ScreenList(this, 0,
-            new GameplayScreen(),
+            menuScreen,
+            gameplayScreen,
             new TestScreen()
         );
+        menuScreen.setScreenReferences(gameplayScreen);
     }
 
     @Override
