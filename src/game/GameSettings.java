@@ -20,6 +20,12 @@ public class GameSettings {
     public int resolutionWidth = 1280;
     public int resolutionHeight = 720;
 
+    /**
+     * Physics settings
+     */
+    public int physicsVelocityIterations = 4; ///< Should be a number between 4 and 16
+    public int physicsPositionIterations = 4; ///< Should be a number between 4 and 16
+
     private GameSettings() {
         // TODO: Load settings from file
     }
