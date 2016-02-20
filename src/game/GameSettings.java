@@ -31,11 +31,15 @@ public class GameSettings {
             return Integer.compare(o1.getHeight(), o2.getHeight());
         });
 
-        // Add all possible unique display modes
+        // Add all possible unique display modes that match bpp and refresh rate of the user desktop mode
+        DisplayMode desktopMode = Display.getDesktopDisplayMode();
         DisplayMode lastMode = null;
         for (DisplayMode mode : modes) {
             // TODO: We only care about fullscreen modes?
             if (!mode.isFullscreenCapable()) continue;
+
+            // TODO: Should we limit this way?
+            if (mode.getFrequency() != desktopMode.getFrequency() || mode.getBitsPerPixel() != desktopMode.getBitsPerPixel()) continue;
 
             // Make sure the mode is unique in size
             if (lastMode != null) {
@@ -48,6 +52,9 @@ public class GameSettings {
         }
     }
 
+    /**
+     * Various options presets for game quality
+     */
     public static enum Preset {
         DEFAULT,
         LOW,
@@ -85,6 +92,11 @@ public class GameSettings {
     public int physicsPositionIterations = 4; ///< Should be a number between 4 and 16
 
     private GameSettings() {
+        // Figure out certain modes
+        DisplayMode highestMode = availableDisplayModes.get(availableDisplayModes.size() - 1);
+        resolutionWidth = highestMode.getWidth();
+        resolutionHeight = highestMode.getHeight();
+
         setToPreset(Preset.DEFAULT);
         loadFromFile();
     }
@@ -96,10 +108,7 @@ public class GameSettings {
         // TODO: Display modes should only be enumerated once
 
 
-        // Figure out certain modes
-        DisplayMode highestMode = availableDisplayModes.get(availableDisplayModes.size() - 1);
-        resolutionWidth = highestMode.getWidth();
-        resolutionHeight = highestMode.getHeight();
+
 
         // Fill out other parts for the presets
         switch (p) {

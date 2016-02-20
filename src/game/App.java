@@ -2,8 +2,10 @@ package game;
 
 import blister.ScreenList;
 import egl.GLDiagnostic;
+import org.lwjgl.Sys;
 import org.lwjgl.opengl.ContextAttribs;
 import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.PixelFormat;
 
 import java.util.logging.Level;
@@ -18,7 +20,10 @@ public class App extends blister.MainGame {
 
     public App(String title, int w, int h) {
         // TODO: (maybe never...) support other versions of OpenGL
-        super(title, w, h, new ContextAttribs(4, 3), new PixelFormat());
+        super(title, w, h,
+            GameSettings.global.useModernOpenGL ? new ContextAttribs(4, 3) : new ContextAttribs(3, 2),
+            new PixelFormat() // TODO: Do we need to check out the pixel format?
+        );
     }
 
     @Override
@@ -41,7 +46,14 @@ public class App extends blister.MainGame {
 
     @Override
     protected void fullLoad() {
-
+        try {
+            Display.setDisplayMode(GameSettings.availableDisplayModes.get(GameSettings.availableDisplayModes.size() - 1));
+            Display.setFullscreen(true);
+        }
+        catch (Exception e) {
+            System.err.println("Can't change the display mode");
+            System.err.println(e.getMessage());
+        }
     }
 
     @Override
@@ -55,7 +67,7 @@ public class App extends blister.MainGame {
 
 
     public static void main(String[] args) {
-        App app = new App("Walker's Game", 1200, 800);
+        App app = new App("Walker's Game", GameSettings.global.resolutionWidth, GameSettings.global.resolutionHeight);
         app.run();
         app.dispose();
     }

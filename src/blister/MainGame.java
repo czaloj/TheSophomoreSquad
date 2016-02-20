@@ -103,7 +103,7 @@ public abstract class MainGame implements IDisposable {
 	public MainGame(String title, int w, int h, ContextAttribs context, org.lwjgl.opengl.PixelFormat pixelFormat) {
 		Display.setVSyncEnabled(true);
 		// Display.setResizable(true);
-		Display.setTitle(title);
+        Display.setTitle(title);
 
 		eKP = new KeyPressEventArgs();
 		eKK = new KeyboardKeyEventArgs();
