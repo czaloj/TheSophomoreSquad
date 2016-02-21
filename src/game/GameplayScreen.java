@@ -4,9 +4,8 @@ import blister.GameTime;
 import egl.BlendState;
 import egl.DepthState;
 import egl.RasterizerState;
-import egl.math.Vector2;
 import game.graphics.Renderer;
-import game.logic.GameState;
+import game.data.GameState;
 import game.logic.GameplayController;
 import org.lwjgl.opengl.GL11;
 

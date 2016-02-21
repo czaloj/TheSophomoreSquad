@@ -1,11 +1,13 @@
 package game.logic;
 
 import game.GameSettings;
+import game.data.GameState;
 
 public class GameplayController {
 
     private GameState state;
     private GameSettings settings;
+    private final PhysicsController physicsController = new PhysicsController();
 
     public void init(GameState s) {
         if (state != null) {
@@ -23,7 +25,7 @@ public class GameplayController {
         // TODO: Input and pre-physics logic
 
         // Integrate the physics world and collect all interactions
-        state.physicsWorld.step(dt, settings.physicsVelocityIterations, settings.physicsPositionIterations);
+        physicsController.update(state, dt);
 
         // TODO: Interactions and cleanups
     }

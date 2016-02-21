@@ -1,6 +1,6 @@
 package game;
 
-import game.logic.GameState;
+import game.data.GameState;
 
 public class GlobalState {
     public static final GlobalState instance = new GlobalState();

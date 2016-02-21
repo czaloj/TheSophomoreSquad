@@ -3,11 +3,16 @@ package game;
 import blister.GameScreen;
 import blister.GameTime;
 import blister.ScreenState;
+import game.data.LevelInformation;
 import game.logic.GameEngine;
-import game.logic.GameState;
+import game.data.GameState;
+
+import java.util.ArrayList;
 
 public class MenuScreen extends GameScreen {
     private GameScreen gameplayScreen;
+    private LevelLoadArgs loadArgs;
+    private final ArrayList<LevelInformation> levels = new ArrayList<>();
 
     private int nextScreen = -1;
 
@@ -37,7 +42,12 @@ public class MenuScreen extends GameScreen {
 
     @Override
     public void build() {
+        // Find all the levels at the beginning
+        GameEngine.findAllLevelData(levels);
 
+        // Loading arguments will persist until the game finishes
+        loadArgs = new LevelLoadArgs();
+        loadArgs.level = levels.get(0);
     }
     @Override
     public void destroy(GameTime gameTime) {
@@ -46,7 +56,6 @@ public class MenuScreen extends GameScreen {
 
     @Override
     public void onEntry(GameTime gameTime) {
-
     }
     @Override
     public void onExit(GameTime gameTime) {
@@ -56,11 +65,11 @@ public class MenuScreen extends GameScreen {
     @Override
     public void update(GameTime gameTime) {
         GlobalState.instance.state = new GameState();
-        GameEngine.loadState(GlobalState.instance.state);
+        GameEngine.loadState(GlobalState.instance.state, loadArgs);
         setState(ScreenState.ChangeNext);
     }
     @Override
     public void draw(GameTime gameTime) {
-
+        
     }
 }
