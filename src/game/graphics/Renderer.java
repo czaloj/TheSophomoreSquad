@@ -22,6 +22,8 @@ public class Renderer {
 
     private final RenderPassLighting passLighting = new RenderPassLighting();
 
+    private final RenderData data = new RenderData();
+
     public Renderer() {
         // Empty
     }
@@ -32,7 +34,6 @@ public class Renderer {
     public void dispose() {
         passLighting.dispose();
     }
-
 
     private void createRenderTargets(int width, int height, int lightWidth, int lightHeight) {
         IntBuffer ib = NativeMem.createIntBuffer(2);
@@ -55,6 +56,10 @@ public class Renderer {
     }
 
     public void draw() {
+        // TODO: Draw the environment of the level
+
+        // TODO: Draw entities
+
         passLighting.draw();
     }
 }
