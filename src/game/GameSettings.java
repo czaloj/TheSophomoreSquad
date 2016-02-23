@@ -2,6 +2,7 @@ package game;
 
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
+import org.lwjgl.opengl.GL11;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Executable;
@@ -74,6 +75,11 @@ public class GameSettings {
     public int lightingQuality;
 
     /**
+     * Damage quality where 1 is pixel-accurate and higher numbers mean less pixel accuracy (1 - 12)
+     */
+    public int damageQuality;
+
+    /**
      * Resolution of the game (width and height)
      */
     public int resolutionWidth;
@@ -84,6 +90,11 @@ public class GameSettings {
      * Otherwise, use OpenGL 3.2 and GLSL version 1.5
      */
     public boolean useModernOpenGL;
+
+    /**
+     * Capabilities of the graphics card
+     */
+    public int maxTextureSize;
 
     /**
      * Physics settings
@@ -114,6 +125,7 @@ public class GameSettings {
         switch (p) {
             case DEFAULT:
                 lightingQuality = 1;
+                damageQuality = 1;
                 useModernOpenGL = true;
                 physicsVelocityIterations = 4;
                 physicsPositionIterations = 4;
@@ -135,4 +147,9 @@ public class GameSettings {
     public void saveToFile() {
         // TODO: Save settings to a file
     }
+
+    public void queryCapabilities() {
+        maxTextureSize = GL11.glGetInteger(GL11.GL_MAX_TEXTURE_SIZE);
+    }
+
 }

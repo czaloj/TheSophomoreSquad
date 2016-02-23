@@ -41,11 +41,13 @@ public class App extends blister.MainGame {
 
     @Override
     protected void fullInitialize() {
-
     }
 
     @Override
     protected void fullLoad() {
+        // We'll check out what we can find at the beginning of the OpenGL context
+        GameSettings.global.queryCapabilities();
+
         try {
             Display.setDisplayMode(GameSettings.availableDisplayModes.get(GameSettings.availableDisplayModes.size() - 1));
             Display.setFullscreen(true);
