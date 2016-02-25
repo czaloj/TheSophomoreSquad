@@ -57,7 +57,7 @@ public class GameEngine {
         // TODO: Load everything but the physics
 
         // Create the physics world
-        PhysicsController.initState(state);
+        PhysicsController.initState(state, loadArgs);
 
         // TODO: Finish up loading and binding references here
     }

@@ -4,6 +4,7 @@ import blister.GameTime;
 import egl.BlendState;
 import egl.DepthState;
 import egl.RasterizerState;
+import game.graphics.DebugRenderer;
 import game.graphics.Renderer;
 import game.data.GameState;
 import game.logic.GameplayController;
@@ -13,6 +14,7 @@ import org.lwjgl.opengl.GL11;
  * \brief
  */
 public class GameplayScreen extends blister.GameScreen {
+    private final DebugRenderer debugRenderer = new DebugRenderer();
     private final Renderer renderer = new Renderer();
     private GameState state;
     private final GameplayController gameplayController = new GameplayController();
@@ -38,10 +40,12 @@ public class GameplayScreen extends blister.GameScreen {
 
     @Override
     public void build() {
+        debugRenderer.init();
         renderer.init();
     }
     @Override
     public void destroy(GameTime gameTime) {
+        debugRenderer.dispose();
         renderer.dispose();
     }
 
@@ -63,13 +67,22 @@ public class GameplayScreen extends blister.GameScreen {
     }
     @Override
     public void draw(GameTime gameTime) {
-        GL11.glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
+        // Clear to black color
+        GL11.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
-        BlendState.OPAQUE.set();
-        DepthState.NONE.set();
-        RasterizerState.CULL_NONE.set();
-        GL11.glViewport(0, 0, 1280, 720);
 
-        renderer.draw();
+        if (GlobalState.instance.debugMode) {
+            // Draw using the debug renderer
+            debugRenderer.draw();
+        }
+        else {
+            // Setup default rendering state
+            BlendState.OPAQUE.set();
+            DepthState.NONE.set();
+            RasterizerState.CULL_NONE.set();
+
+            // Draw using the full renderer
+            renderer.draw();
+        }
     }
 }
