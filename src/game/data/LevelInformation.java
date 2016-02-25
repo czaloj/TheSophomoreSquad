@@ -1,5 +1,9 @@
 package game.data;
 
+import egl.math.Vector4;
+
+import java.util.ArrayList;
+
 public class LevelInformation {
     /**
      * The file name relative to the level directory
@@ -10,4 +14,11 @@ public class LevelInformation {
      * The friendly name of the level
      */
     public String name;
+
+    /**
+     * List of rectangles specifying colliding surfaces
+     */
+    public final ArrayList<Vector4> levelGeometry = new ArrayList<>();
+
+    
 }
