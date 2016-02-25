@@ -13,12 +13,15 @@ public class TestingOps {
         levelInfo.name = "Test Level";
 
         // Floor
-        levelInfo.levelGeometry.add(new Vector4(0, 1, 50, 2));
+        levelInfo.levelGeometry.add(new Vector4(0, 1, 50, 1));
         // Roof
-        levelInfo.levelGeometry.add(new Vector4(0, 49, 50, 2));
+        levelInfo.levelGeometry.add(new Vector4(0, 49, 50, 1));
         // Right side
-        levelInfo.levelGeometry.add(new Vector4(49, 25, 2, 23));
+        levelInfo.levelGeometry.add(new Vector4(49, 25, 1, 23));
         // Left side
-        levelInfo.levelGeometry.add(new Vector4(-49, 25, 2, 23));
+        levelInfo.levelGeometry.add(new Vector4(-49, 25, 1, 23));
+
+        // Spawning point of the character
+        levelInfo.spawnPoint.set(0, 4);
     }
 }
