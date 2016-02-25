@@ -1,13 +1,16 @@
 package game.logic;
 
+import egl.math.Vector2;
 import egl.math.Vector4;
 import game.GameSettings;
 import game.LevelLoadArgs;
+import game.data.CharacterInformation;
 import game.data.GameState;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.*;
+import org.lwjgl.Sys;
 
 /**
  * Handles the physics of the game
@@ -45,10 +48,32 @@ public class PhysicsController {
         }
 
         // TODO: Add entities
+        addEntity(state.physicsWorld, args.character, args.level.spawnPoint);
     }
 
-    public static void addEntity() {
+    public static void addEntity(World world, CharacterInformation character, Vector2 spawn) {
         // TODO: Figure it out
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = BodyType.DYNAMIC;
+        bodyDef.fixedRotation = true;
+        bodyDef.position.set(spawn.x, spawn.y);
+        bodyDef.angle = 0.0f;
+        // TODO: Fill out special body userdata
+        Body body = world.createBody(bodyDef);
+
+        // Create the shape of the obstacle
+
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.density = 1.0f;
+        fixtureDef.friction = 1.0f;
+        fixtureDef.restitution = 1.0f;
+        PolygonShape s = new PolygonShape();
+        s.setAsBox(character.size.x * 0.5f, character.size.y * 0.5f, new Vec2(0.0f, 0.0f), 0.0f);
+        fixtureDef.shape = s;
+        // TODO: Fill out special joint userdata and filter
+
+        // Body now has its fixture
+        body.createFixture(fixtureDef);
     }
 
     public void update(GameState state, float dt) {
@@ -58,5 +83,12 @@ public class PhysicsController {
         state.physicsWorld.step(dt, GameSettings.global.physicsVelocityIterations, GameSettings.global.physicsPositionIterations);
 
         // TODO: Parse interactions
+
+        // TODO: Temp remove
+        for (Body b = state.physicsWorld.getBodyList(); b != null; b = b.getNext()) {
+            if (b.getType() == BodyType.DYNAMIC) {
+                System.out.println("Position Y: " + b.getPosition().y);
+            }
+        }
     }
 }

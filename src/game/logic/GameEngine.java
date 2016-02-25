@@ -3,6 +3,7 @@ package game.logic;
 import com.sun.java.accessibility.util.TopLevelWindowListener;
 import game.LevelLoadArgs;
 import game.TestingOps;
+import game.data.CharacterInformation;
 import game.data.GameState;
 import game.data.LevelInformation;
 import org.jbox2d.common.Vec2;
@@ -32,6 +33,11 @@ public class GameEngine {
      * @param levels Output list
      */
     public static void findAllLevelData(ArrayList<LevelInformation> levels) {
+        // TODO: Temp remove for testing only
+        LevelInformation liTest = new LevelInformation();
+        TestingOps.createLevel(liTest);
+        levels.add(liTest);
+
         File dirLevels = new File(DIRECTORY_LEVELS);
         File[] files = dirLevels.listFiles();
         for (File file : files) {
@@ -44,13 +50,19 @@ public class GameEngine {
 
             levels.add(li);
         }
-
-        // TODO: Temp remove for testing only
-        LevelInformation li = new LevelInformation();
-        TestingOps.createLevel(li);
-        levels.add(li);
     }
 
+    /**
+     * Load all the characters
+     * @param characters Output list
+     */
+    public static void loadAllCharacterData(ArrayList<CharacterInformation> characters) {
+        // Add Walker McMillan White
+        characters.add(new CharacterInformation() {{
+            name = "Walker";
+            size.set(0.5f, 0.8f);
+        }});
+    }
 
 
     public static void loadState(GameState state, LevelLoadArgs loadArgs) {

@@ -3,6 +3,7 @@ package game;
 import blister.GameScreen;
 import blister.GameTime;
 import blister.ScreenState;
+import game.data.CharacterInformation;
 import game.data.LevelInformation;
 import game.logic.GameEngine;
 import game.data.GameState;
@@ -22,6 +23,10 @@ public class MenuScreen extends GameScreen {
      * A list of all the levels known by the menu
      */
     private final ArrayList<LevelInformation> levels = new ArrayList<>();
+    /**
+     * A list of all the characters known by the menu
+     */
+    private final ArrayList<CharacterInformation> characters = new ArrayList<>();
 
     /**
      * Screen for which to transition to
@@ -58,6 +63,9 @@ public class MenuScreen extends GameScreen {
         // Find all the levels at the beginning
         GameEngine.findAllLevelData(levels);
 
+        // Also load all the characters
+        GameEngine.loadAllCharacterData(characters);
+
         // Loading arguments will persist until the game finishes
         loadArgs = new LevelLoadArgs();
     }
@@ -79,6 +87,7 @@ public class MenuScreen extends GameScreen {
     public void update(GameTime gameTime) {
         // TODO: Temp until UI performs this action
         loadArgs.level = levels.get(0);
+        loadArgs.character = characters.get(0);
 
         if (loadArgs.level != null) {
             // TODO: Move to a loading thread?
