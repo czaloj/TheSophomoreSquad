@@ -63,7 +63,7 @@ public class GameplayScreen extends blister.GameScreen {
     @Override
     public void update(GameTime gameTime) {
         // TODO: Use fixed time step
-        gameplayController.update((float)gameTime.elapsed);
+        gameplayController.update(1.0f / 60.0f);
     }
     @Override
     public void draw(GameTime gameTime) {
