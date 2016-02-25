@@ -17,6 +17,7 @@ public class LevelInformation {
 
     /**
      * List of rectangles specifying colliding surfaces
+     * (center x, center y, half width, half height)
      */
     public final ArrayList<Vector4> levelGeometry = new ArrayList<>();
 

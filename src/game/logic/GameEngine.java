@@ -2,6 +2,7 @@ package game.logic;
 
 import com.sun.java.accessibility.util.TopLevelWindowListener;
 import game.LevelLoadArgs;
+import game.TestingOps;
 import game.data.GameState;
 import game.data.LevelInformation;
 import org.jbox2d.common.Vec2;
@@ -43,6 +44,11 @@ public class GameEngine {
 
             levels.add(li);
         }
+
+        // TODO: Temp remove for testing only
+        LevelInformation li = new LevelInformation();
+        TestingOps.createLevel(li);
+        levels.add(li);
     }
 
 
