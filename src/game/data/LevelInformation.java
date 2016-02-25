@@ -1,5 +1,6 @@
 package game.data;
 
+import egl.math.Vector2;
 import egl.math.Vector4;
 
 import java.util.ArrayList;
@@ -21,5 +22,8 @@ public class LevelInformation {
      */
     public final ArrayList<Vector4> levelGeometry = new ArrayList<>();
 
-    
+    /**
+     * The spawning point of the character in the level
+     */
+    public final Vector2 spawnPoint = new Vector2();
 }
