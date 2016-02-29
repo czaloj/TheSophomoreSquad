@@ -48,6 +48,7 @@ public class Box2DBatcher extends DebugDraw {
     private int vertexPolyCount;
     private int vertexPolyCapacity;
     private int vertexDeclPolys;
+    private ByteBuffer dataPolys;
 
     /**
      * Vertex data for textured quads (circles, axes, etc.)
@@ -56,6 +57,7 @@ public class Box2DBatcher extends DebugDraw {
     private int vertexQuadCount;
     private int vertexQuadCapacity;
     private int vertexDeclQuads;
+    private ByteBuffer dataQuads;
 
     public Box2DBatcher() {
         // Create the batcher with an identity transform
@@ -70,17 +72,16 @@ public class Box2DBatcher extends DebugDraw {
         setFlags(DebugDraw.e_shapeBit);
     }
 
-
     public void init() {
         // Create the vertex buffer for the polygons
         vertexPolys = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, vertexPolys);
         vertexPolyCapacity = 10;
         vertexPolyCount = 0;
-        ByteBuffer bbData = NativeMem.createByteBuffer(SIZE_VERTEX_POLY * vertexPolyCount);
-        bbData.position(0);
-        bbData.limit(SIZE_VERTEX_POLY * vertexPolyCount);
-        glBufferData(GL_ARRAY_BUFFER, bbData, GL_DYNAMIC_DRAW);
+        dataPolys = NativeMem.createByteBuffer(SIZE_VERTEX_POLY * vertexPolyCount);
+        dataPolys.position(0);
+        dataPolys.limit(SIZE_VERTEX_POLY * vertexPolyCount);
+        glBufferData(GL_ARRAY_BUFFER, dataPolys, GL_DYNAMIC_DRAW);
 
         // Vertex declaration for the polygons
         vertexDeclPolys = glGenVertexArrays();
@@ -91,19 +92,21 @@ public class Box2DBatcher extends DebugDraw {
         glBindBuffer(GL_ARRAY_BUFFER, vertexQuads);
         vertexQuadCapacity = 10;
         vertexQuadCount = 0;
-        bbData = NativeMem.createByteBuffer(SIZE_VERTEX_QUAD * vertexPolyCount);
-        bbData.position(0);
-        bbData.limit(SIZE_VERTEX_QUAD * vertexQuadCount);
-        glBufferData(GL_ARRAY_BUFFER, bbData, GL_DYNAMIC_DRAW);
+        dataQuads = NativeMem.createByteBuffer(SIZE_VERTEX_QUAD * vertexPolyCount);
+        dataQuads.position(0);
+        dataQuads.limit(SIZE_VERTEX_QUAD * vertexQuadCount);
+        glBufferData(GL_ARRAY_BUFFER, dataQuads, GL_DYNAMIC_DRAW);
 
         // Vertex declaration for the quads
         vertexDeclQuads = glGenVertexArrays();
         // TODO: Fill out
     }
     public void dispose() {
-
+        glDeleteBuffers(vertexPolys);
+        glDeleteVertexArrays(vertexDeclPolys);
+        glDeleteBuffers(vertexQuads);
+        glDeleteVertexArrays(vertexDeclQuads);
     }
-
 
     @Override
     public void drawPoint(Vec2 argPoint, float argRadiusOnScreen, Color3f argColor) {
@@ -113,6 +116,9 @@ public class Box2DBatcher extends DebugDraw {
     @Override
     public void drawSolidPolygon(Vec2[] vertices, int vertexCount, Color3f color) {
         System.out.println("Draw Polygon");
+        for (int i = 2; i < vertexCount; i++) {
+            //TODO: Add 0, i-1, i
+        }
     }
 
     @Override
