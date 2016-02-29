@@ -2,16 +2,7 @@ package game.graphics;
 
 import egl.*;
 import egl.math.Matrix4;
-import egl.math.Vector4;
 import game.data.GameState;
-import org.jbox2d.callbacks.DebugDraw;
-import org.jbox2d.collision.shapes.PolygonShape;
-import org.jbox2d.common.Color3f;
-import org.jbox2d.common.Transform;
-import org.jbox2d.common.Vec2;
-import org.jbox2d.dynamics.Body;
-import org.jbox2d.dynamics.Fixture;
-import org.jbox2d.dynamics.joints.JointEdge;
 
 /**
  * Renders the game as simple as possible

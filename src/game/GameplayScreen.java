@@ -51,9 +51,9 @@ public class GameplayScreen extends blister.GameScreen {
 
     @Override
     public void onEntry(GameTime gameTime) {
-        // Empty
         state = GlobalState.instance.state;
         gameplayController.init(state);
+        debugRenderer.setState(state);
     }
     @Override
     public void onExit(GameTime gameTime) {

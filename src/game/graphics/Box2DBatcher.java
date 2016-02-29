@@ -62,7 +62,12 @@ public class Box2DBatcher extends DebugDraw {
         super(new OBBViewportTransform());
         viewportTransform.setCamera(0.0f, 0.0f, 1.0f);
         viewportTransform.setCenter(0.0f, 0.0f);
-        viewportTransform.setExtents(GameSettings.global.resolutionWidth * 0.5f, GameSettings.global.resolutionHeight * 0.5f);
+        viewportTransform.setExtents(
+            GameSettings.global.resolutionWidth * 0.5f,
+            GameSettings.global.resolutionHeight * 0.5f
+        );
+
+        setFlags(DebugDraw.e_shapeBit);
     }
 
 
@@ -102,36 +107,36 @@ public class Box2DBatcher extends DebugDraw {
 
     @Override
     public void drawPoint(Vec2 argPoint, float argRadiusOnScreen, Color3f argColor) {
-
+        System.out.println("Draw Point");
     }
 
     @Override
     public void drawSolidPolygon(Vec2[] vertices, int vertexCount, Color3f color) {
-
+        System.out.println("Draw Polygon");
     }
 
     @Override
     public void drawCircle(Vec2 center, float radius, Color3f color) {
-
+        System.out.println("Draw Circle");
     }
 
     @Override
     public void drawSolidCircle(Vec2 center, float radius, Vec2 axis, Color3f color) {
-
+        System.out.println("Draw Solid Circle");
     }
 
     @Override
     public void drawSegment(Vec2 p1, Vec2 p2, Color3f color) {
-
+        System.out.println("Draw Segment");
     }
 
     @Override
     public void drawTransform(Transform xf) {
-
+        System.out.println("Draw Transform");
     }
 
     @Override
     public void drawString(float x, float y, String s, Color3f color) {
-
+        System.out.println("Draw String");
     }
 }
