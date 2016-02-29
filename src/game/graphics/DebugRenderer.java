@@ -16,11 +16,12 @@ import org.jbox2d.dynamics.joints.JointEdge;
 /**
  * Renders the game as simple as possible
  */
-public class DebugRenderer implements DebugDraw {
+public class DebugRenderer {
     private GameState state;
     private SpriteBatch batch;
     private final Matrix4 cameraMatrix = new Matrix4();
     private final Matrix4 identityMatrix = new Matrix4();
+    private final Box2DBatcher batcher = new Box2DBatcher();
 
     public DebugRenderer() {
         // Empty
@@ -36,7 +37,7 @@ public class DebugRenderer implements DebugDraw {
 
     public void setState(GameState s) {
         state = s;
-        state.physicsWorld.setDebugDraw(this);
+        state.physicsWorld.setDebugDraw(batcher);
     }
 
 
@@ -60,40 +61,5 @@ public class DebugRenderer implements DebugDraw {
             DepthState.DEFAULT,
             RasterizerState.CULL_NONE
         );
-    }
-
-    @Override
-    public void drawPoint(Vec2 argPoint, float argRadiusOnScreen, Color3f argColor) {
-
-    }
-
-    @Override
-    public void drawSolidPolygon(Vec2[] vertices, int vertexCount, Color3f color) {
-
-    }
-
-    @Override
-    public void drawCircle(Vec2 center, float radius, Color3f color) {
-
-    }
-
-    @Override
-    public void drawSolidCircle(Vec2 center, float radius, Vec2 axis, Color3f color) {
-
-    }
-
-    @Override
-    public void drawSegment(Vec2 p1, Vec2 p2, Color3f color) {
-
-    }
-
-    @Override
-    public void drawTransform(Transform xf) {
-
-    }
-
-    @Override
-    public void drawString(float x, float y, String s, Color3f color) {
-
     }
 }
