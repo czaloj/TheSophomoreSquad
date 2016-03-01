@@ -49,6 +49,7 @@ public class Box2DBatcher extends DebugDraw {
     private int vertexPolyCapacity;
     private int vertexDeclPolys;
     private ByteBuffer dataPolys;
+    private boolean updatePolys = false;
 
     /**
      * Vertex data for textured quads (circles, axes, etc.)
@@ -58,6 +59,7 @@ public class Box2DBatcher extends DebugDraw {
     private int vertexQuadCapacity;
     private int vertexDeclQuads;
     private ByteBuffer dataQuads;
+    private boolean updateQuads = false;
 
     public Box2DBatcher() {
         // Create the batcher with an identity transform
@@ -78,7 +80,7 @@ public class Box2DBatcher extends DebugDraw {
         glBindBuffer(GL_ARRAY_BUFFER, vertexPolys);
         vertexPolyCapacity = 10;
         vertexPolyCount = 0;
-        dataPolys = NativeMem.createByteBuffer(SIZE_VERTEX_POLY * vertexPolyCount);
+        dataPolys = NativeMem.createByteBuffer(SIZE_VERTEX_POLY * vertexPolyCapacity);
         dataPolys.position(0);
         dataPolys.limit(SIZE_VERTEX_POLY * vertexPolyCount);
         glBufferData(GL_ARRAY_BUFFER, dataPolys, GL_DYNAMIC_DRAW);
@@ -92,7 +94,7 @@ public class Box2DBatcher extends DebugDraw {
         glBindBuffer(GL_ARRAY_BUFFER, vertexQuads);
         vertexQuadCapacity = 10;
         vertexQuadCount = 0;
-        dataQuads = NativeMem.createByteBuffer(SIZE_VERTEX_QUAD * vertexPolyCount);
+        dataQuads = NativeMem.createByteBuffer(SIZE_VERTEX_QUAD * vertexQuadCapacity);
         dataQuads.position(0);
         dataQuads.limit(SIZE_VERTEX_QUAD * vertexQuadCount);
         glBufferData(GL_ARRAY_BUFFER, dataQuads, GL_DYNAMIC_DRAW);
@@ -116,8 +118,30 @@ public class Box2DBatcher extends DebugDraw {
     @Override
     public void drawSolidPolygon(Vec2[] vertices, int vertexCount, Color3f color) {
         System.out.println("Draw Polygon");
+        ensurePolyCapacity(vertexPolyCount + 3 * (vertexCount - 2));
         for (int i = 2; i < vertexCount; i++) {
-            //TODO: Add 0, i-1, i
+            dataPolys.putFloat(vertices[0].x);
+            dataPolys.putFloat(vertices[0].y);
+            dataPolys.putFloat(0.0f);
+            dataPolys.put((byte)(color.x * 255));
+            dataPolys.put((byte)(color.y * 255));
+            dataPolys.put((byte)(color.z * 255));
+
+            dataPolys.putFloat(vertices[i - 1].x);
+            dataPolys.putFloat(vertices[i - 1].y);
+            dataPolys.putFloat(0.0f);
+            dataPolys.put((byte)(color.x * 255));
+            dataPolys.put((byte)(color.y * 255));
+            dataPolys.put((byte)(color.z * 255));
+
+            dataPolys.putFloat(vertices[i].x);
+            dataPolys.putFloat(vertices[i].y);
+            dataPolys.putFloat(0.0f);
+            dataPolys.put((byte)(color.x * 255));
+            dataPolys.put((byte)(color.y * 255));
+            dataPolys.put((byte)(color.z * 255));
+
+            vertexPolyCount += 3;
         }
     }
 
@@ -145,4 +169,62 @@ public class Box2DBatcher extends DebugDraw {
     public void drawString(float x, float y, String s, Color3f color) {
         System.out.println("Draw String");
     }
+
+    public void ensurePolyCapacity(int desiredCapacity) {
+        if (desiredCapacity >= vertexPolyCapacity) {
+            vertexPolyCapacity *= 2;
+            ByteBuffer newData = NativeMem.createByteBuffer(SIZE_VERTEX_POLY * vertexPolyCapacity);
+            dataPolys.flip();
+            newData.put(dataPolys);
+            dataPolys = newData;
+            updatePolys = true;
+        }
+    }
+    public void ensureQuadCapacity(int desiredCapacity) {
+        if (desiredCapacity >= vertexQuadCapacity) {
+            vertexQuadCapacity *= 2;
+            ByteBuffer newData = NativeMem.createByteBuffer(SIZE_VERTEX_QUAD * vertexQuadCapacity);
+            dataQuads.flip();
+            newData.put(dataQuads);
+            dataQuads = newData;
+            updateQuads = true;
+        }
+    }
+
+
+    /**
+     * Pushes stored drawing data to the GPU
+     */
+    public void pushData() {
+        // Send the polygon information to the GPU
+        dataPolys.flip();
+        glBindBuffer(GL_ARRAY_BUFFER, vertexPolys);
+        if (updatePolys) {
+            // Resize required
+            dataPolys.limit(SIZE_VERTEX_POLY * vertexPolyCapacity);
+            glBufferData(GL_ARRAY_BUFFER, dataPolys, GL_DYNAMIC_DRAW);
+            updatePolys = false;
+        }
+        else {
+            // Push a subportion of the data
+            glBufferSubData(GL_ARRAY_BUFFER, 0, dataPolys);
+        }
+        vertexPolyCount = 0;
+
+        // Send the quad information to the GPU
+        dataQuads.flip();
+        glBindBuffer(GL_ARRAY_BUFFER, vertexQuads);
+        if (updateQuads) {
+            // Resize required
+            dataQuads.limit(SIZE_VERTEX_QUAD * vertexQuadCapacity);
+            glBufferData(GL_ARRAY_BUFFER, dataQuads, GL_DYNAMIC_DRAW);
+            updateQuads = false;
+        }
+        else {
+            // Push a subportion of the data
+            glBufferSubData(GL_ARRAY_BUFFER, 0, dataQuads);
+        }
+        vertexQuadCount = 0;
+    }
+
 }

@@ -9,10 +9,9 @@ import game.data.GameState;
  */
 public class DebugRenderer {
     private GameState state;
-    private SpriteBatch batch;
     private final Matrix4 cameraMatrix = new Matrix4();
-    private final Matrix4 identityMatrix = new Matrix4();
     private final Box2DBatcher batcher = new Box2DBatcher();
+    private final GLProgram progPolygon = new GLProgram(false);
 
     public DebugRenderer() {
         // Empty
@@ -20,10 +19,13 @@ public class DebugRenderer {
 
 
     public void init() {
-        batch = new SpriteBatch(true);
+        batcher.init();
+        progPolygon.setHeader(4, 3);
+        progPolygon.quickCreateResource("DebugRenderPolygon", "game/graphics/shaders/", "game/graphics/shaders/", null);
+
     }
     public void dispose() {
-        batch.dispose();
+        batcher.dispose();
     }
 
     public void setState(GameState s) {
@@ -41,16 +43,10 @@ public class DebugRenderer {
                 state.cameraCenter.y + state.cameraHalfViewSize.y,
                 cameraMatrix);
 
-        // Draw objects
-        batch.begin();
+        // Draw objects to vertex data
         state.physicsWorld.drawDebugData();
-        batch.end(SpriteSortMode.BackToFront);
-        batch.renderBatch(
-            cameraMatrix, identityMatrix,
-            BlendState.ALPHA_BLEND,
-            SamplerState.POINT_WRAP,
-            DepthState.DEFAULT,
-            RasterizerState.CULL_NONE
-        );
+        batcher.pushData();
+
+
     }
 }
