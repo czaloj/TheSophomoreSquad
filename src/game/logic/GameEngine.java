@@ -1,6 +1,7 @@
 package game.logic;
 
 import com.sun.java.accessibility.util.TopLevelWindowListener;
+import game.GameSettings;
 import game.LevelLoadArgs;
 import game.TestingOps;
 import game.data.CharacterInformation;
@@ -67,6 +68,10 @@ public class GameEngine {
 
     public static void loadState(GameState state, LevelLoadArgs loadArgs) {
         // TODO: Load everything but the physics
+
+        // TODO: Check this part out
+        state.cameraCenter.set(0, 0);
+        state.cameraHalfViewSize.set(GameSettings.global.resolutionWidth, GameSettings.global.resolutionHeight).mul(0.05f);
 
         // Create the physics world
         PhysicsController.initState(state, loadArgs);

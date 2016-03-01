@@ -33,13 +33,13 @@ public class Box2DBatcher extends DebugDraw {
      * Color 4 bytes
      *
      */
-    private static final int SIZE_VERTEX_POLY = 12 + 4;
+    public static final int SIZE_VERTEX_POLY = 12 + 4;
     /**
      * Position 3 floats
      * UV Coordinate 2 floats
      * Color 4 bytes
      */
-    private static final int SIZE_VERTEX_QUAD = 12 + 8 + 4;
+    public static final int SIZE_VERTEX_QUAD = 12 + 8 + 4;
 
     /**
      * Vertex data for simple polygons
@@ -47,7 +47,6 @@ public class Box2DBatcher extends DebugDraw {
     private int vertexPolys;
     private int vertexPolyCount;
     private int vertexPolyCapacity;
-    private int vertexDeclPolys;
     private ByteBuffer dataPolys;
     private boolean updatePolys = false;
 
@@ -57,7 +56,6 @@ public class Box2DBatcher extends DebugDraw {
     private int vertexQuads;
     private int vertexQuadCount;
     private int vertexQuadCapacity;
-    private int vertexDeclQuads;
     private ByteBuffer dataQuads;
     private boolean updateQuads = false;
 
@@ -86,10 +84,6 @@ public class Box2DBatcher extends DebugDraw {
         glBufferData(GL_ARRAY_BUFFER, dataPolys, GL_DYNAMIC_DRAW);
         dataPolys.rewind();
 
-        // Vertex declaration for the polygons
-        vertexDeclPolys = glGenVertexArrays();
-        // TODO: Fill out
-
         // Create the vertex buffer for the quads
         vertexQuads = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, vertexQuads);
@@ -100,16 +94,24 @@ public class Box2DBatcher extends DebugDraw {
         dataQuads.limit(SIZE_VERTEX_QUAD * vertexQuadCapacity);
         glBufferData(GL_ARRAY_BUFFER, dataQuads, GL_DYNAMIC_DRAW);
         dataQuads.rewind();
-
-        // Vertex declaration for the quads
-        vertexDeclQuads = glGenVertexArrays();
-        // TODO: Fill out
     }
     public void dispose() {
         glDeleteBuffers(vertexPolys);
-        glDeleteVertexArrays(vertexDeclPolys);
         glDeleteBuffers(vertexQuads);
-        glDeleteVertexArrays(vertexDeclQuads);
+    }
+
+    public int getPolyVBO() {
+        return vertexPolys;
+    }
+    public int getQuadVBO() {
+        return vertexQuads;
+    }
+
+    public int getPolyVertexCount() {
+        return vertexPolyCount;
+    }
+    public int getQuadVertexCount() {
+        return vertexQuadCount;
     }
 
     @Override
@@ -231,6 +233,7 @@ public class Box2DBatcher extends DebugDraw {
         }
         dataQuads.rewind();
         vertexQuadCount = 0;
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
 }
