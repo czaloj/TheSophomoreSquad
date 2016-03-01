@@ -49,8 +49,9 @@ public class App extends blister.MainGame {
         GameSettings.global.queryCapabilities();
 
         try {
-            Display.setDisplayMode(GameSettings.availableDisplayModes.get(GameSettings.availableDisplayModes.size() - 1));
-            Display.setFullscreen(true);
+            // TODO: Enable this later
+            // Display.setDisplayMode(GameSettings.availableDisplayModes.get(GameSettings.availableDisplayModes.size() - 1));
+            // Display.setFullscreen(true);
         }
         catch (Exception e) {
             System.err.println("Can't change the display mode");

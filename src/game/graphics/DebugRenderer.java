@@ -21,7 +21,11 @@ public class DebugRenderer {
     public void init() {
         batcher.init();
         progPolygon.setHeader(4, 3);
-        progPolygon.quickCreateResource("DebugRenderPolygon", "game/graphics/shaders/", "game/graphics/shaders/", null);
+        progPolygon.quickCreateResource(
+            "DebugRenderPolygon",
+            "game/graphics/shaders/VDebug.glsl",
+            "game/graphics/shaders/FDebug.glsl",
+            null);
 
     }
     public void dispose() {
