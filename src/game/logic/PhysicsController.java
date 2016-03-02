@@ -35,7 +35,7 @@ public class PhysicsController {
         FixtureDef obstacleFixtureDef = new FixtureDef();
         obstacleFixtureDef.density = 0.0f;
         obstacleFixtureDef.friction = 1.0f;
-        obstacleFixtureDef.restitution = 1.0f;
+        obstacleFixtureDef.restitution = 0.0f;
         for (Vector4 rect : args.level.levelGeometry) {
             // Create the shape of the obstacle
             PolygonShape s = new PolygonShape();
@@ -65,8 +65,8 @@ public class PhysicsController {
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.density = 1.0f;
-        fixtureDef.friction = 1.0f;
-        fixtureDef.restitution = 1.0f;
+        fixtureDef.friction = 0.0f;
+        fixtureDef.restitution = 0.0f;
         PolygonShape s = new PolygonShape();
         s.setAsBox(character.size.x * 0.5f, character.size.y * 0.5f, new Vec2(0.0f, 0.0f), 0.0f);
         fixtureDef.shape = s;
@@ -83,12 +83,5 @@ public class PhysicsController {
         state.physicsWorld.step(dt, GameSettings.global.physicsVelocityIterations, GameSettings.global.physicsPositionIterations);
 
         // TODO: Parse interactions
-
-        // TODO: Temp remove
-        for (Body b = state.physicsWorld.getBodyList(); b != null; b = b.getNext()) {
-            if (b.getType() == BodyType.DYNAMIC) {
-                System.out.println("Position Y: " + b.getPosition().y);
-            }
-        }
     }
 }
