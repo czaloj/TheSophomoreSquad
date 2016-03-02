@@ -21,7 +21,10 @@ public class TestingOps {
         // Left side
         levelInfo.levelGeometry.add(new Vector4(-49, 25, 1, 23));
 
+        // Interesting thing
+        levelInfo.levelGeometry.add(new Vector4(3, 3, 1, 1));
+
         // Spawning point of the character
-        levelInfo.spawnPoint.set(0, 4);
+        levelInfo.spawnPoint.set(-1, 5);
     }
 }
