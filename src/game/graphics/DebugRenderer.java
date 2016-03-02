@@ -39,15 +39,15 @@ public class DebugRenderer {
         batcher.init();
 
         vertexDeclPolys = glGenVertexArrays();
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, batcher.getPolyVBO());
         glBindVertexArray(vertexDeclPolys);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, batcher.getPolyVBO());
         GL20.glEnableVertexAttribArray(progPolygon.getAttribute("vPosition"));
         GL20.glVertexAttribPointer(progPolygon.getAttribute("vPosition"), 3, GL11.GL_FLOAT, false, Box2DBatcher.SIZE_VERTEX_POLY, 0);
         GL20.glEnableVertexAttribArray(progPolygon.getAttribute("vColor"));
-        GL20.glVertexAttribPointer(progPolygon.getAttribute("vColor"), 4, GL11.GL_BYTE, false, Box2DBatcher.SIZE_VERTEX_POLY, 12);
+        GL20.glVertexAttribPointer(progPolygon.getAttribute("vColor"), 4, GL11.GL_UNSIGNED_BYTE, true, Box2DBatcher.SIZE_VERTEX_POLY, 12);
         vertexDeclQuads = glGenVertexArrays();
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, batcher.getQuadVBO());
         glBindVertexArray(vertexDeclQuads);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, batcher.getQuadVBO());
         // TODO: Fill out
         glBindVertexArray(0);
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
@@ -85,10 +85,8 @@ public class DebugRenderer {
 
         progPolygon.use();
         glBindVertexArray(vertexDeclPolys);
-        GL20.glEnableVertexAttribArray(progPolygon.getAttribute("vPosition"));
-        GL20.glEnableVertexAttribArray(progPolygon.getAttribute("vColor"));
-
         GLUniform.setST(progPolygon.getUniform("unVP"), cameraMatrix, false);
         GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, batcher.getPolyVertexCount());
+        glBindVertexArray(0);
     }
 }

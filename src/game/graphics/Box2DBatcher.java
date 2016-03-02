@@ -129,7 +129,6 @@ public class Box2DBatcher extends DebugDraw {
 
     @Override
     public void drawSolidPolygon(Vec2[] vertices, int vertexCount, Color3f color) {
-        System.out.println("Draw Polygon");
         vertexPolyCount += 3 * (vertexCount - 2);
         ensurePolyCapacity(vertexPolyCount);
         Color c = new Color().set(new Colorf(color.x, color.y, color.z));
