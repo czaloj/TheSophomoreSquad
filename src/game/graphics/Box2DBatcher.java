@@ -18,6 +18,8 @@ import static org.lwjgl.opengl.GL43.*;
 import static org.lwjgl.opengl.GL44.*;
 
 import egl.NativeMem;
+import egl.math.Color;
+import egl.math.Colorf;
 import game.GameSettings;
 import org.jbox2d.callbacks.DebugDraw;
 import org.jbox2d.common.Color3f;
@@ -82,7 +84,6 @@ public class Box2DBatcher extends DebugDraw {
         dataPolys.position(0);
         dataPolys.limit(SIZE_VERTEX_POLY * vertexPolyCapacity);
         glBufferData(GL_ARRAY_BUFFER, dataPolys, GL_DYNAMIC_DRAW);
-        dataPolys.rewind();
 
         // Create the vertex buffer for the quads
         vertexQuads = glGenBuffers();
@@ -93,7 +94,6 @@ public class Box2DBatcher extends DebugDraw {
         dataQuads.position(0);
         dataQuads.limit(SIZE_VERTEX_QUAD * vertexQuadCapacity);
         glBufferData(GL_ARRAY_BUFFER, dataQuads, GL_DYNAMIC_DRAW);
-        dataQuads.rewind();
     }
     public void dispose() {
         glDeleteBuffers(vertexPolys);
@@ -114,6 +114,14 @@ public class Box2DBatcher extends DebugDraw {
         return vertexQuadCount;
     }
 
+    public void begin() {
+        vertexPolyCount = 0;
+        dataPolys.rewind();
+        vertexQuadCount = 0;
+        dataQuads.rewind();
+    }
+
+
     @Override
     public void drawPoint(Vec2 argPoint, float argRadiusOnScreen, Color3f argColor) {
         System.out.println("Draw Point");
@@ -124,30 +132,31 @@ public class Box2DBatcher extends DebugDraw {
         System.out.println("Draw Polygon");
         vertexPolyCount += 3 * (vertexCount - 2);
         ensurePolyCapacity(vertexPolyCount);
+        Color c = new Color().set(new Colorf(color.x, color.y, color.z));
         for (int i = 2; i < vertexCount; i++) {
             dataPolys.putFloat(vertices[0].x);
             dataPolys.putFloat(vertices[0].y);
             dataPolys.putFloat(0.0f);
-            dataPolys.put((byte)(color.x * 255));
-            dataPolys.put((byte)(color.y * 255));
-            dataPolys.put((byte)(color.z * 255));
-            dataPolys.put((byte)255);
+            dataPolys.put(c.R);
+            dataPolys.put(c.G);
+            dataPolys.put(c.B);
+            dataPolys.put(c.A);
 
             dataPolys.putFloat(vertices[i - 1].x);
             dataPolys.putFloat(vertices[i - 1].y);
             dataPolys.putFloat(0.0f);
-            dataPolys.put((byte)(color.x * 255));
-            dataPolys.put((byte)(color.y * 255));
-            dataPolys.put((byte)(color.z * 255));
-            dataPolys.put((byte)255);
+            dataPolys.put(c.R);
+            dataPolys.put(c.G);
+            dataPolys.put(c.B);
+            dataPolys.put(c.A);
 
             dataPolys.putFloat(vertices[i].x);
             dataPolys.putFloat(vertices[i].y);
             dataPolys.putFloat(0.0f);
-            dataPolys.put((byte)(color.x * 255));
-            dataPolys.put((byte)(color.y * 255));
-            dataPolys.put((byte)(color.z * 255));
-            dataPolys.put((byte)255);
+            dataPolys.put(c.R);
+            dataPolys.put(c.G);
+            dataPolys.put(c.B);
+            dataPolys.put(c.A);
         }
     }
 
@@ -215,8 +224,6 @@ public class Box2DBatcher extends DebugDraw {
             // Push a subportion of the data
             glBufferSubData(GL_ARRAY_BUFFER, 0, dataPolys);
         }
-        dataPolys.rewind();
-        vertexPolyCount = 0;
 
         // Send the quad information to the GPU
         dataQuads.flip();
@@ -231,8 +238,7 @@ public class Box2DBatcher extends DebugDraw {
             // Push a subportion of the data
             glBufferSubData(GL_ARRAY_BUFFER, 0, dataQuads);
         }
-        dataQuads.rewind();
-        vertexQuadCount = 0;
+
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 

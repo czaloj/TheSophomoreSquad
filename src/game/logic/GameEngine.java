@@ -70,8 +70,8 @@ public class GameEngine {
         // TODO: Load everything but the physics
 
         // TODO: Check this part out
-        state.cameraCenter.set(0, 0);
-        state.cameraHalfViewSize.set(GameSettings.global.resolutionWidth, GameSettings.global.resolutionHeight).mul(0.05f);
+        state.cameraCenter.set(0, 3);
+        state.cameraHalfViewSize.set(GameSettings.global.resolutionWidth, GameSettings.global.resolutionHeight).mul(0.01f);
 
         // Create the physics world
         PhysicsController.initState(state, loadArgs);

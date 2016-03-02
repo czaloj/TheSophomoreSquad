@@ -42,9 +42,9 @@ public class DebugRenderer {
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, batcher.getPolyVBO());
         glBindVertexArray(vertexDeclPolys);
         GL20.glEnableVertexAttribArray(progPolygon.getAttribute("vPosition"));
-        glVertexAttribIPointer(progPolygon.getAttribute("vPosition"), 3, GL11.GL_FLOAT, Box2DBatcher.SIZE_VERTEX_POLY, 0);
+        GL20.glVertexAttribPointer(progPolygon.getAttribute("vPosition"), 3, GL11.GL_FLOAT, false, Box2DBatcher.SIZE_VERTEX_POLY, 0);
         GL20.glEnableVertexAttribArray(progPolygon.getAttribute("vColor"));
-        glVertexAttribIPointer(progPolygon.getAttribute("vColor"), 4, GL11.GL_BYTE, Box2DBatcher.SIZE_VERTEX_POLY, 12);
+        GL20.glVertexAttribPointer(progPolygon.getAttribute("vColor"), 4, GL11.GL_BYTE, false, Box2DBatcher.SIZE_VERTEX_POLY, 12);
         vertexDeclQuads = glGenVertexArrays();
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, batcher.getQuadVBO());
         glBindVertexArray(vertexDeclQuads);
@@ -68,6 +68,7 @@ public class DebugRenderer {
     public void draw() {
         RasterizerState.CULL_NONE.set();
         DepthState.NONE.set();
+        BlendState.OPAQUE.set();
 
         // Set the camera
         Matrix4.createOrthographic2D(
@@ -78,11 +79,14 @@ public class DebugRenderer {
                 cameraMatrix);
 
         // Draw objects to vertex data
+        batcher.begin();
         state.physicsWorld.drawDebugData();
         batcher.pushData();
 
         progPolygon.use();
         glBindVertexArray(vertexDeclPolys);
+        GL20.glEnableVertexAttribArray(progPolygon.getAttribute("vPosition"));
+        GL20.glEnableVertexAttribArray(progPolygon.getAttribute("vColor"));
 
         GLUniform.setST(progPolygon.getUniform("unVP"), cameraMatrix, false);
         GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, batcher.getPolyVertexCount());
