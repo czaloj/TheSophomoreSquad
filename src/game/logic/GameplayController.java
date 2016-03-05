@@ -7,7 +7,7 @@ public class GameplayController {
 
     private GameState state;
     private GameSettings settings;
-    private final PhysicsController physicsController = new PhysicsController();
+    private PhysicsController physicsController;
 
     public void init(GameState s) {
         if (state != null) {
@@ -18,7 +18,10 @@ public class GameplayController {
         state = s;
         settings = GameSettings.global;
 
-        // TODO: Add extra stuff
+        if (state != null) {
+            physicsController = new PhysicsController(s);
+            // TODO: Add extra stuff
+        }
     }
 
     public void update(float dt) {

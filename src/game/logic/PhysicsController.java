@@ -6,16 +6,22 @@ import game.GameSettings;
 import game.LevelLoadArgs;
 import game.data.CharacterInformation;
 import game.data.GameState;
+import game.data.PhysicsDataBody;
+import game.data.PhysicsDataFixture;
+import org.jbox2d.callbacks.ContactImpulse;
+import org.jbox2d.callbacks.ContactListener;
+import org.jbox2d.collision.Manifold;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.*;
+import org.jbox2d.dynamics.contacts.Contact;
 import org.lwjgl.Sys;
 
 /**
  * Handles the physics of the game
  */
-public class PhysicsController {
+public class PhysicsController implements ContactListener {
     public static final float DEFAULT_GRAVITY = -10;
 
     public static void initState(GameState state, LevelLoadArgs args) {
@@ -58,7 +64,9 @@ public class PhysicsController {
         bodyDef.fixedRotation = true;
         bodyDef.position.set(spawn.x, spawn.y);
         bodyDef.angle = 0.0f;
+        PhysicsDataBody dataBody = new PhysicsDataBody();
         // TODO: Fill out special body userdata
+        bodyDef.userData = dataBody;
         Body body = world.createBody(bodyDef);
 
         // Create the shape of the obstacle
@@ -70,10 +78,17 @@ public class PhysicsController {
         PolygonShape s = new PolygonShape();
         s.setAsBox(character.size.x * 0.5f, character.size.y * 0.5f, new Vec2(0.0f, 0.0f), 0.0f);
         fixtureDef.shape = s;
+        PhysicsDataFixture dataFixture = new PhysicsDataFixture();
         // TODO: Fill out special joint userdata and filter
+        fixtureDef.userData = dataFixture;
 
         // Body now has its fixture
         body.createFixture(fixtureDef);
+    }
+
+    public PhysicsController(GameState state) {
+        // Add self to the contact listener
+        state.physicsWorld.setContactListener(this);
     }
 
     public void update(GameState state, float dt) {
@@ -83,5 +98,27 @@ public class PhysicsController {
         state.physicsWorld.step(dt, GameSettings.global.physicsVelocityIterations, GameSettings.global.physicsPositionIterations);
 
         // TODO: Parse interactions
+    }
+
+    @Override
+    public void beginContact(Contact contact) {
+        // TODO: Implement
+    }
+
+    @Override
+    public void endContact(Contact contact) {
+        // TODO: Implement
+        PhysicsDataFixture dataA = (PhysicsDataFixture)contact.getFixtureA().getUserData();
+        PhysicsDataFixture dataB = (PhysicsDataFixture)contact.getFixtureB().getUserData();
+    }
+
+    @Override
+    public void preSolve(Contact contact, Manifold oldManifold) {
+        // TODO: Implement
+    }
+
+    @Override
+    public void postSolve(Contact contact, ContactImpulse impulse) {
+        // TODO: Implement
     }
 }
