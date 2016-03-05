@@ -13,6 +13,7 @@ import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.*;
 import org.jbox2d.dynamics.contacts.Contact;
+import org.lwjgl.Sys;
 
 /**
  * Handles the physics of the game
@@ -30,7 +31,9 @@ public class PhysicsController implements ContactListener {
         obstacleBodyDef.fixedRotation = true;
         obstacleBodyDef.position.set(0.0f, 0.0f);
         obstacleBodyDef.angle = 0.0f;
+        PhysicsDataBody dataBody = new PhysicsDataBody();
         // TODO: Fill out special body userdata
+        obstacleBodyDef.userData = dataBody;
         Body obstacleBody = state.physicsWorld.createBody(obstacleBodyDef);
 
         // Add all the collision obstacles
@@ -43,7 +46,11 @@ public class PhysicsController implements ContactListener {
             PolygonShape s = new PolygonShape();
             s.setAsBox(rect.z, rect.w, new Vec2(rect.x, rect.y), 0.0f);
             obstacleFixtureDef.shape = s;
+            PhysicsDataFixture dataFixture = new PhysicsDataFixture();
+            dataFixture.objectType = PhysicsDataFixture.OBJECT_TYPE_MAP;
+            dataFixture.object = null;
             // TODO: Fill out special joint userdata and filter
+            obstacleFixtureDef.userData = dataFixture;
 
             // Body now has its fixture
             obstacleBody.createFixture(obstacleFixtureDef);
@@ -75,6 +82,8 @@ public class PhysicsController implements ContactListener {
         s.setRadius(character.roundness);
         fixtureDef.shape = s;
         PhysicsDataFixture dataFixture = new PhysicsDataFixture();
+        dataFixture.objectType = PhysicsDataFixture.OBJECT_TYPE_CHARACTER;
+        dataFixture.object = outCharacter;
         // TODO: Fill out special joint userdata and filter
         fixtureDef.userData = dataFixture;
 
@@ -104,8 +113,6 @@ public class PhysicsController implements ContactListener {
     @Override
     public void endContact(Contact contact) {
         // TODO: Implement
-        PhysicsDataFixture dataA = (PhysicsDataFixture)contact.getFixtureA().getUserData();
-        PhysicsDataFixture dataB = (PhysicsDataFixture)contact.getFixtureB().getUserData();
     }
 
     @Override
@@ -116,5 +123,42 @@ public class PhysicsController implements ContactListener {
     @Override
     public void postSolve(Contact contact, ContactImpulse impulse) {
         // TODO: Implement
+        PhysicsDataFixture dataA = (PhysicsDataFixture)contact.getFixtureA().getUserData();
+        PhysicsDataFixture dataB = (PhysicsDataFixture)contact.getFixtureB().getUserData();
+
+        // Ordering swap
+        boolean flip = false;
+        if (dataA.objectType > dataB.objectType) {
+            flip = true;
+            PhysicsDataFixture tmp = dataA;
+            dataA = dataB;
+            dataB = tmp;
+        }
+        switch (dataA.objectType) {
+            case PhysicsDataFixture.OBJECT_TYPE_MAP:
+                switch (dataB.objectType) {
+                    case PhysicsDataFixture.OBJECT_TYPE_MAP:
+                        // Do nothing here
+                        break;
+                    case PhysicsDataFixture.OBJECT_TYPE_CHARACTER:
+                        contactCharacterMap(contact, dataA, dataB, flip);
+                        break;
+                }
+                break;
+            case PhysicsDataFixture.OBJECT_TYPE_CHARACTER:
+                switch (dataB.objectType) {
+                    case PhysicsDataFixture.OBJECT_TYPE_CHARACTER:
+                        break;
+                }
+                break;
+        }
+    }
+
+    private void contactCharacterMap(Contact contact, PhysicsDataFixture dMap, PhysicsDataFixture dChar, boolean flip) {
+        float yNormal = -contact.getManifold().localNormal.y;
+        if (flip) yNormal = -yNormal;
+
+        Character c = (Character)dChar.object;
+        c.isGrounded |= yNormal > 0.2f;
     }
 }
