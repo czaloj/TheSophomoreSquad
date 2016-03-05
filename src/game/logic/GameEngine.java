@@ -65,12 +65,17 @@ public class GameEngine {
             size.set(0.5f, 0.8f);
             roundness = 0.1f;
             density = 1.0f;
+            movePower = 1.0f;
+            jumpPower = 30.0f;
+            stoppingPower = 2.4f;
+            airMovementRatio = 0.6f;
         }});
     }
 
 
     public static void loadState(GameState state, LevelLoadArgs loadArgs) {
         state.player = new Character();
+        Spawner.initializeCharacter(state.player, loadArgs.playerCharacter);
 
         // TODO: Load everything but the physics
 

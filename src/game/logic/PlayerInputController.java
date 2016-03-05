@@ -105,7 +105,6 @@ public class PlayerInputController {
 
         public Input[] inputs = {
             Input.createKeyboardAxis(Keyboard.KEY_D, Keyboard.KEY_A),
-            Input.createButton(Input.TYPE_KEYBOARD, Keyboard.KEY_D),
             Input.createButton(Input.TYPE_KEYBOARD, Keyboard.KEY_W),
             Input.createButton(Input.TYPE_MOUSE, MouseButton.Right),
             Input.createButton(Input.TYPE_MOUSE, MouseButton.Left),
