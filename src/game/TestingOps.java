@@ -22,7 +22,7 @@ public class TestingOps {
         levelInfo.levelGeometry.add(new Vector4(-49, 25, 1, 23));
 
         // Interesting thing
-        levelInfo.levelGeometry.add(new Vector4(3, 3, 1, 1));
+        levelInfo.levelGeometry.add(new Vector4(1, 2.4f, 0.25f, 0.4f));
 
         // Spawning point of the character
         levelInfo.spawnPoint.set(-1, 5);

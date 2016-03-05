@@ -62,6 +62,8 @@ public class GameEngine {
         characters.add(new CharacterInformation() {{
             name = "Walker";
             size.set(0.5f, 0.8f);
+            roundness = 0.1f;
+            density = 1.0f;
         }});
     }
 

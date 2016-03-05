@@ -10,4 +10,8 @@ public class Character {
      * Physics information for the entity
      */
     public Body body;
+
+    // Movement information
+    public float movePower;
+    public float jumpPower;
 }

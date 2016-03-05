@@ -58,7 +58,6 @@ public class PhysicsController implements ContactListener {
     }
 
     public static void addEntity(World world, CharacterInformation character, Vector2 spawn) {
-        // TODO: Figure it out
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyType.DYNAMIC;
         bodyDef.fixedRotation = true;
@@ -69,14 +68,14 @@ public class PhysicsController implements ContactListener {
         bodyDef.userData = dataBody;
         Body body = world.createBody(bodyDef);
 
-        // Create the shape of the obstacle
-
+        // Create the movement shape of the character
         FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.density = 1.0f;
+        fixtureDef.density = character.density;
         fixtureDef.friction = 0.0f;
         fixtureDef.restitution = 0.0f;
         PolygonShape s = new PolygonShape();
-        s.setAsBox(character.size.x * 0.5f, character.size.y * 0.5f, new Vec2(0.0f, 0.0f), 0.0f);
+        s.setAsBox(character.size.x * 0.5f - character.roundness, character.size.y * 0.5f - character.roundness, new Vec2(0.0f, 0.0f), 0.0f);
+        s.setRadius(character.roundness);
         fixtureDef.shape = s;
         PhysicsDataFixture dataFixture = new PhysicsDataFixture();
         // TODO: Fill out special joint userdata and filter
