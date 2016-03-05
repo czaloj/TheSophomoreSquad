@@ -8,6 +8,7 @@ import game.graphics.DebugRenderer;
 import game.graphics.Renderer;
 import game.data.GameState;
 import game.logic.GameplayController;
+import game.logic.PlayerInputController;
 import org.lwjgl.opengl.GL11;
 
 /**
@@ -18,6 +19,8 @@ public class GameplayScreen extends blister.GameScreen {
     private final Renderer renderer = new Renderer();
     private GameState state;
     private final GameplayController gameplayController = new GameplayController();
+
+    private final PlayerInputController playerInputController = new PlayerInputController();
 
 
     @Override
@@ -54,16 +57,23 @@ public class GameplayScreen extends blister.GameScreen {
         state = GlobalState.instance.state;
         gameplayController.init(state);
         debugRenderer.setState(state);
+
+        // Initialize input controllers
+        playerInputController.init();
+        playerInputController.reset(state.player.input);
     }
     @Override
     public void onExit(GameTime gameTime) {
-        // Empty
+        // Destroy input controllers
+        playerInputController.dispose();
     }
 
     @Override
     public void update(GameTime gameTime) {
         // TODO: Use fixed time step
-        gameplayController.update(1.0f / 60.0f);
+        float dt = 1.0f / 60.0f;
+        playerInputController.update(dt);
+        gameplayController.update(dt);
     }
     @Override
     public void draw(GameTime gameTime) {
