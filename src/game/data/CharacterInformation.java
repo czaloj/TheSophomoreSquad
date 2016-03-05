@@ -32,5 +32,13 @@ public class CharacterInformation {
      * Jumping power
      */
     public float jumpPower;
+    /**
+     * How fast the character is able to stop itself
+     */
+    public float stoppingPower;
+    /**
+     * How fast the character is able to move in the air
+     */
+    public float airMovementRatio;
 }
 

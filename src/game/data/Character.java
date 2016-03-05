@@ -15,4 +15,7 @@ public class Character {
     public final EntityInput input = new EntityInput();
     public float movePower;
     public float jumpPower;
+    public float stoppingPower;
+    public float airMovementRatio;
+    public boolean isGrounded;
 }
