@@ -99,7 +99,7 @@ public class TextInput {
 
 	// V This Is To Hack Around The Fact That Java Can't Use Functions As Values (Java Sucks)
 	
-	private static class OnRC_F extends ACEventFuncRef<TextInput, KeyPressEventArgs> {
+	private static class OnRC_F implements ACEventFuncRef<TextInput, KeyPressEventArgs> {
 		@Override
 		public void Receive(TextInput o, Object sender, KeyPressEventArgs args) {
 			o.OnChar(sender, args);
@@ -111,7 +111,7 @@ public class TextInput {
 		Insert(args.KeyChar);
 	}
 
-	private static class OnKP_F extends ACEventFuncRef<TextInput, KeyboardKeyEventArgs> {
+	private static class OnKP_F implements ACEventFuncRef<TextInput, KeyboardKeyEventArgs> {
 		@Override
 		public void Receive(TextInput o, Object sender, KeyboardKeyEventArgs args) {
 			o.OnKeyPress(sender, args);

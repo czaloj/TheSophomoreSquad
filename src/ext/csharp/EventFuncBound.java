@@ -1,6 +1,6 @@
 package ext.csharp;
 
-public class EventFuncBound<L, T extends EventArgs> extends ACEventFunc<T> {
+public class EventFuncBound<L, T extends EventArgs> implements ACEventFunc<T> {
 	private final L refObj;
 	private final ACEventFuncRef<L, T> function;
 	public EventFuncBound(L bound, ACEventFuncRef<L, T> f) {

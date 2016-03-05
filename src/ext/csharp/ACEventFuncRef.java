@@ -1,5 +1,5 @@
 package ext.csharp;
 
-public abstract class ACEventFuncRef<L, T extends EventArgs> {
-	public abstract void Receive(L o, Object sender, T args);
+public interface ACEventFuncRef<L, T extends EventArgs> {
+	void Receive(L o, Object sender, T args);
 }
