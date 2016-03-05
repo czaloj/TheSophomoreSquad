@@ -4,19 +4,15 @@ import egl.math.Vector2;
 import egl.math.Vector4;
 import game.GameSettings;
 import game.LevelLoadArgs;
-import game.data.CharacterInformation;
-import game.data.GameState;
-import game.data.PhysicsDataBody;
-import game.data.PhysicsDataFixture;
+import game.data.*;
+import game.data.Character;
 import org.jbox2d.callbacks.ContactImpulse;
 import org.jbox2d.callbacks.ContactListener;
 import org.jbox2d.collision.Manifold;
 import org.jbox2d.collision.shapes.PolygonShape;
-import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.*;
 import org.jbox2d.dynamics.contacts.Contact;
-import org.lwjgl.Sys;
 
 /**
  * Handles the physics of the game
@@ -54,10 +50,11 @@ public class PhysicsController implements ContactListener {
         }
 
         // TODO: Add entities
-        addEntity(state.physicsWorld, args.character, args.level.spawnPoint);
+        // Create the player
+        addEntity(state.physicsWorld, args.playerCharacter, args.level.spawnPoint, state.player);
     }
 
-    public static void addEntity(World world, CharacterInformation character, Vector2 spawn) {
+    public static void addEntity(World world, CharacterInformation character, Vector2 spawn, Character outCharacter) {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyType.DYNAMIC;
         bodyDef.fixedRotation = true;
@@ -66,7 +63,7 @@ public class PhysicsController implements ContactListener {
         PhysicsDataBody dataBody = new PhysicsDataBody();
         // TODO: Fill out special body userdata
         bodyDef.userData = dataBody;
-        Body body = world.createBody(bodyDef);
+        outCharacter.body = world.createBody(bodyDef);
 
         // Create the movement shape of the character
         FixtureDef fixtureDef = new FixtureDef();
@@ -82,7 +79,7 @@ public class PhysicsController implements ContactListener {
         fixtureDef.userData = dataFixture;
 
         // Body now has its fixture
-        body.createFixture(fixtureDef);
+        outCharacter.body.createFixture(fixtureDef);
     }
 
     public PhysicsController(GameState state) {

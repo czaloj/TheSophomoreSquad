@@ -17,4 +17,9 @@ public class GameState {
      * The half-size of the bounds that the camera views
      */
     public final Vector2 cameraHalfViewSize = new Vector2();
+
+    /**
+     * The main player
+     */
+    public Character player;
 }

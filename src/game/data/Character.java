@@ -12,6 +12,7 @@ public class Character {
     public Body body;
 
     // Movement information
+    public final EntityInput input = new EntityInput();
     public float movePower;
     public float jumpPower;
 }

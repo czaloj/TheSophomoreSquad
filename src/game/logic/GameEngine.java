@@ -4,6 +4,7 @@ import com.sun.java.accessibility.util.TopLevelWindowListener;
 import game.GameSettings;
 import game.LevelLoadArgs;
 import game.TestingOps;
+import game.data.Character;
 import game.data.CharacterInformation;
 import game.data.GameState;
 import game.data.LevelInformation;
@@ -69,6 +70,8 @@ public class GameEngine {
 
 
     public static void loadState(GameState state, LevelLoadArgs loadArgs) {
+        state.player = new Character();
+
         // TODO: Load everything but the physics
 
         // TODO: Check this part out

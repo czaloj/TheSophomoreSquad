@@ -17,7 +17,7 @@ public class LevelLoadArgs {
     /**
      * The character used for playing on the level
      */
-    public CharacterInformation character;
+    public CharacterInformation playerCharacter;
 
     // TODO: Add information about the character and other stage debuffs etc.
 }
