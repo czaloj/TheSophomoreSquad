@@ -7,6 +7,7 @@ import egl.RasterizerState;
 import game.graphics.DebugRenderer;
 import game.graphics.Renderer;
 import game.data.GameState;
+import game.logic.AIController;
 import game.logic.GameplayController;
 import game.logic.PlayerInputController;
 import org.lwjgl.opengl.GL11;
@@ -21,6 +22,7 @@ public class GameplayScreen extends blister.GameScreen {
     private final GameplayController gameplayController = new GameplayController();
 
     private final PlayerInputController playerInputController = new PlayerInputController();
+    private final AIController aiController = new AIController();
 
 
     @Override
@@ -61,11 +63,13 @@ public class GameplayScreen extends blister.GameScreen {
         // Initialize input controllers
         playerInputController.init();
         playerInputController.reset(state.player.input);
+        aiController.init(state);
     }
     @Override
     public void onExit(GameTime gameTime) {
         // Destroy input controllers
         playerInputController.dispose();
+        aiController.dispose();
     }
 
     @Override
