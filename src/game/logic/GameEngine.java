@@ -74,8 +74,10 @@ public class GameEngine {
 
 
     public static void loadState(GameState state, LevelLoadArgs loadArgs) {
+        // Create the player
         state.player = new Character();
         Spawner.initializeCharacter(state.player, loadArgs.playerCharacter);
+        state.characters.add(state.player);
 
         // TODO: Load everything but the physics
 

@@ -32,8 +32,7 @@ public class GameplayController {
 
     public void update(float dt) {
         // TODO: Input and pre-physics logic
-        float moveForce = state.player.movePower * state.player.input.moveDirection;
-        updateInput(state.player, dt);
+        for (Character c : state.characters) updateInput(c, dt);
 
         // Integrate the physics world and collect all interactions
         state.player.isGrounded = false;
@@ -71,11 +70,12 @@ public class GameplayController {
             }
         }
 
-
+        // Jumping impulse
         Vec2 impulse = new Vec2(0.0f, 0.0f);
         if (c.input.jump && c.isGrounded) {
             impulse.y = c.jumpPower * dt;
             c.body.applyLinearImpulse(impulse, new Vec2());
         }
+        // TODO: Add dash?
     }
 }
