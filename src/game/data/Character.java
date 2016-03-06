@@ -7,6 +7,11 @@ import org.jbox2d.dynamics.Body;
  */
 public class Character {
     /**
+     * Reference to the original information used to spawn this character
+     */
+    public CharacterInformation info;
+
+    /**
      * Physics information for the entity
      */
     public Body body;

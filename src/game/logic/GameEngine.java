@@ -62,6 +62,7 @@ public class GameEngine {
         // Add Walker McMillan White
         characters.add(new CharacterInformation() {{
             name = "Walker";
+            isPlayer = true;
             size.set(0.5f, 0.8f);
             roundness = 0.1f;
             density = 1.0f;

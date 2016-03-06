@@ -8,6 +8,7 @@ import game.data.CharacterInformation;
  */
 public class Spawner {
     public static void initializeCharacter(Character c, CharacterInformation info) {
+        c.info = info;
         c.jumpPower = info.jumpPower;
         c.movePower = info.movePower;
         c.stoppingPower = info.stoppingPower;

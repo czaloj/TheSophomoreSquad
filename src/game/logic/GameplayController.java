@@ -35,7 +35,6 @@ public class GameplayController {
         for (Character c : state.characters) updateInput(c, dt);
 
         // Integrate the physics world and collect all interactions
-        state.player.isGrounded = false;
         physicsController.update(state, dt);
 
         // TODO: Interactions and cleanups

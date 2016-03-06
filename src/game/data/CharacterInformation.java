@@ -10,6 +10,10 @@ public class CharacterInformation {
      * The friendly name of the character
      */
     public String name;
+    /**
+     * Information on whether this is a player-driven character
+     */
+    public boolean isPlayer;
 
     /**
      * The size of the character for movement purposes

@@ -20,6 +20,25 @@ import org.lwjgl.Sys;
  */
 public class PhysicsController implements ContactListener {
     public static final float DEFAULT_GRAVITY = -10;
+    public static final float THRESHOLD_GROUNDING_SLOPE = 0.2f;
+
+    public static final int CATEGORY_MAP = 1 << 0;
+    public static final int CATEGORY_PLAYER = 1 << 1;
+    public static final int CATEGORY_ENEMY = 1 << 2;
+    public static final int CATEGORY_DECOR = 1 << 3;
+
+    public static final Filter FILTER_MAP = new Filter() {{
+        categoryBits = CATEGORY_MAP;
+        maskBits = CATEGORY_PLAYER | CATEGORY_ENEMY | CATEGORY_DECOR;
+    }};
+    public static final Filter FILTER_PLAYER = new Filter() {{
+        categoryBits = CATEGORY_PLAYER;
+        maskBits = CATEGORY_MAP;
+    }};
+    public static final Filter FILTER_ENEMIES = new Filter() {{
+        categoryBits = CATEGORY_ENEMY;
+        maskBits = CATEGORY_MAP;
+    }};
 
     public static void initState(GameState state, LevelLoadArgs args) {
         // Create the world with a default gravity
@@ -46,6 +65,7 @@ public class PhysicsController implements ContactListener {
             PolygonShape s = new PolygonShape();
             s.setAsBox(rect.z, rect.w, new Vec2(rect.x, rect.y), 0.0f);
             obstacleFixtureDef.shape = s;
+            obstacleFixtureDef.filter.set(FILTER_MAP);
             PhysicsDataFixture dataFixture = new PhysicsDataFixture();
             dataFixture.objectType = PhysicsDataFixture.OBJECT_TYPE_MAP;
             dataFixture.object = null;
@@ -58,10 +78,10 @@ public class PhysicsController implements ContactListener {
 
         // TODO: Add entities
         // Create the player
-        addEntity(state.physicsWorld, args.playerCharacter, args.level.spawnPoint, state.player);
+        addEntity(state.physicsWorld, args.level.spawnPoint, state.player);
     }
 
-    public static void addEntity(World world, CharacterInformation character, Vector2 spawn, Character outCharacter) {
+    public static void addEntity(World world, Vector2 spawn, Character outCharacter) {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyType.DYNAMIC;
         bodyDef.fixedRotation = true;
@@ -74,13 +94,14 @@ public class PhysicsController implements ContactListener {
 
         // Create the movement shape of the character
         FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.density = character.density;
+        fixtureDef.density = outCharacter.info.density;
         fixtureDef.friction = 0.0f;
         fixtureDef.restitution = 0.0f;
         PolygonShape s = new PolygonShape();
-        s.setAsBox(character.size.x * 0.5f - character.roundness, character.size.y * 0.5f - character.roundness, new Vec2(0.0f, 0.0f), 0.0f);
-        s.setRadius(character.roundness);
+        s.setAsBox(outCharacter.info.size.x * 0.5f - outCharacter.info.roundness, outCharacter.info.size.y * 0.5f - outCharacter.info.roundness, new Vec2(0.0f, 0.0f), 0.0f);
+        s.setRadius(outCharacter.info.roundness);
         fixtureDef.shape = s;
+        fixtureDef.filter.set(outCharacter.info.isPlayer ? FILTER_PLAYER : FILTER_ENEMIES);
         PhysicsDataFixture dataFixture = new PhysicsDataFixture();
         dataFixture.objectType = PhysicsDataFixture.OBJECT_TYPE_CHARACTER;
         dataFixture.object = outCharacter;
@@ -98,6 +119,9 @@ public class PhysicsController implements ContactListener {
 
     public void update(GameState state, float dt) {
         // TODO: Perform analyses?
+
+        // Goodbye to the grounded flag
+        for (Character c : state.characters) c.isGrounded = false;
 
         // Integrate the physics world
         state.physicsWorld.step(dt, GameSettings.global.physicsVelocityIterations, GameSettings.global.physicsPositionIterations);
@@ -159,6 +183,6 @@ public class PhysicsController implements ContactListener {
         if (flip) yNormal = -yNormal;
 
         Character c = (Character)dChar.object;
-        c.isGrounded |= yNormal > 0.2f;
+        c.isGrounded |= yNormal > THRESHOLD_GROUNDING_SLOPE;
     }
 }
