@@ -88,6 +88,7 @@ public class MenuScreen extends GameScreen {
         // TODO: Temp until UI performs this action
         loadArgs.level = levels.get(0);
         loadArgs.playerCharacter = characters.get(0);
+        loadArgs.enemies.add(characters.get(1));
 
         if (loadArgs.level != null) {
             // TODO: Move to a loading thread?

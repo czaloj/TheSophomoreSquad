@@ -77,6 +77,7 @@ public class GameplayScreen extends blister.GameScreen {
         // TODO: Use fixed time step
         float dt = 1.0f / 60.0f;
         playerInputController.update(dt);
+        aiController.update(dt);
         gameplayController.update(dt);
     }
     @Override

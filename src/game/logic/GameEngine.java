@@ -1,7 +1,9 @@
 package game.logic;
 
 import com.sun.java.accessibility.util.TopLevelWindowListener;
+import egl.math.Vector2;
 import game.GameSettings;
+import game.GlobalState;
 import game.LevelLoadArgs;
 import game.TestingOps;
 import game.data.Character;
@@ -71,6 +73,18 @@ public class GameEngine {
             stoppingPower = 2.4f;
             airMovementRatio = 0.6f;
         }});
+
+        characters.add(new CharacterInformation() {{
+            name = "Minion";
+            isPlayer = false;
+            size.set(0.4f, 0.6f);
+            roundness = 0.1f;
+            density = 0.6f;
+            movePower = 1.0f;
+            jumpPower = 30.0f;
+            stoppingPower = 1.4f;
+            airMovementRatio = 0.2f;
+        }});
     }
 
 
@@ -79,6 +93,11 @@ public class GameEngine {
         state.player = new Character();
         Spawner.initializeCharacter(state.player, loadArgs.playerCharacter);
         state.characters.add(state.player);
+
+        // TODO: Temp test code
+        Character minion = new Character();
+        Spawner.initializeCharacter(minion, loadArgs.enemies.get(0));
+        state.characters.add(minion);
 
         // TODO: Load everything but the physics
 
@@ -90,5 +109,6 @@ public class GameEngine {
         PhysicsController.initState(state, loadArgs);
 
         // TODO: Finish up loading and binding references here
+        PhysicsController.addEntity(state.physicsWorld, new Vector2(4, 6), minion);
     }
 }
