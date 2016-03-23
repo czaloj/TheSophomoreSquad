@@ -62,6 +62,14 @@ public class ImageSlideScreen extends SlideScreen {
 
         float aspectWindow = (float)game.getWidth() / (float)game.getHeight();
         float aspectImage = (float)texture.getWidth() / (float)texture.getHeight();
+        if (aspectImage > aspectWindow) {
+            origin.set(-1, -1 * aspectWindow / aspectImage);
+            size.set(2, 2 * aspectWindow / aspectImage);
+        }
+        else {
+            origin.set(-1 * aspectImage / aspectWindow, -1);
+            size.set(2 * aspectImage / aspectWindow, 2);
+        }
         // TODO: Finish computation
 
         // Draw only that image
