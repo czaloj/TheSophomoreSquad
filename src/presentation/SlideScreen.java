@@ -2,11 +2,19 @@ package presentation;
 
 import blister.GameScreen;
 import blister.GameTime;
+import blister.ScreenState;
+import blister.input.KeyPressEventArgs;
+import blister.input.KeyboardEventDispatcher;
+import blister.input.KeyboardKeyEventArgs;
+import ext.csharp.ACEventFunc;
+import org.lwjgl.input.Keyboard;
 
 /**
  * \brief
  */
 public class SlideScreen extends GameScreen {
+    private ACEventFunc<KeyboardKeyEventArgs> fKeyPress;
+
     @Override
     public int getNext() {
         return getIndex() + 1;
@@ -36,11 +44,21 @@ public class SlideScreen extends GameScreen {
 
     @Override
     public void onEntry(GameTime gameTime) {
-        // Empty
+        fKeyPress = (sender, args) -> {
+            switch (args.key) {
+                case Keyboard.KEY_LEFT:
+                    if (args.getControl()) setState(ScreenState.ChangePrevious);
+                    break;
+                case Keyboard.KEY_RIGHT:
+                    if (args.getControl()) setState(ScreenState.ChangeNext);
+                    break;
+            }
+        };
+        KeyboardEventDispatcher.OnKeyPressed.add(fKeyPress);
     }
     @Override
     public void onExit(GameTime gameTime) {
-        // Empty
+        KeyboardEventDispatcher.OnKeyPressed.remove(fKeyPress);
     }
 
     @Override
