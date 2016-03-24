@@ -56,4 +56,42 @@ public class ConnectedTextureBuilder {
             default: return 0;
         }
     }
+
+    private static boolean checkDiff(int[] ids, int i, int ox, int oy, int w) {
+        return ids[i] != ids[oy * w + ox];
+    }
+
+    public static void buildTextureIndices(int[] ids, int[] outIndices, int w, int h) {
+        int i = 0;
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                // We only compute for non-zero IDs
+                if (ids[i] == 0) {
+                    outIndices[i++] = 0;
+                    continue;
+                }
+
+                // Create the occlusion mask from neighboring tiles
+                int n = 0;
+                if (y > 0) {
+                    if (x > 0 && checkDiff(ids, i, x - 1, y - 1, w)) n |= 0x02;
+                    if (checkDiff(ids, i, x, y - 1, w)) n |= 0x0E;
+                    if (x < (w - 1) && checkDiff(ids, i, x + 1, y - 1, w)) n |= 0x08;
+                }
+                if (y < (h - 1)) {
+                    if (x > 0 && checkDiff(ids, i, x - 1, y + 1, w)) n |= 0x80;
+                    if (checkDiff(ids, i, x, y + 1, w)) n |= 0xE0;
+                    if (x < (w - 1) && checkDiff(ids, i, x + 1, y + 1, w)) n |= 0x20;
+                }
+                if (x > 0) {
+                    if (checkDiff(ids, i, x - 1, y, w)) n |= 0x83;
+                }
+                if (x < (w - 1)) {
+                    if (checkDiff(ids, i, x + 1, y, w)) n |= 0x38;
+                }
+
+                outIndices[i++] = mapNeighbors(n);
+            }
+        }
+    }
 }
