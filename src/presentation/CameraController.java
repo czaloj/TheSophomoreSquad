@@ -28,10 +28,10 @@ public class CameraController {
         if (mouseButtonHeld) mouseDelta.add((args.dx / w) * 2, (args.dy / h) * 2);
     };
     private ACEventFunc<MouseButtonEventArgs> fMousePress = (sender, args) -> {
-        if (args.button == MouseButton.Left) mouseButtonHeld = true;
+        if (args.button == MouseButton.Middle) mouseButtonHeld = true;
     };
     private ACEventFunc<MouseButtonEventArgs> fMouseRelease = (sender, args) -> {
-        if (args.button == MouseButton.Left) mouseButtonHeld = false;
+        if (args.button == MouseButton.Middle) mouseButtonHeld = false;
     };
 
     public void start() {
