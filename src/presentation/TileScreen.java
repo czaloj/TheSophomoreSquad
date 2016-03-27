@@ -4,14 +4,20 @@ import blister.GameTime;
 import blister.input.*;
 import egl.*;
 import egl.math.*;
+import egl.math.Color;
 import ext.csharp.ACEventFunc;
 import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.EXTAbgr;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.INTELMapTexture;
 import presentation.tiles.ConnectedTextureBuilder;
 
+import javax.swing.*;
+import java.awt.*;
+import java.io.File;
 import java.util.function.Function;
 
 /**
@@ -33,12 +39,49 @@ public class TileScreen extends SlideScreen {
     private GLTexture texLargeRepeat;
     private GLTexture texOverlay;
 
+    private int tileViewingType = 0;
+
     private final Matrix4 mCamera = new Matrix4();
     private final Matrix4 mIdentity = new Matrix4();
     private CameraController cameraController;
 
     private ACEventFunc<KeyboardKeyEventArgs> fKeyPress = (sender, args) -> {
         switch (args.key) {
+            case Keyboard.KEY_O:
+                try {
+                    Display.setFullscreen(false);
+                    JFileChooser fileChooser = new JFileChooser();
+                    fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
+                    int result = fileChooser.showOpenDialog(new JFrame());
+                    if (result == JFileChooser.APPROVE_OPTION) {
+                        String selectedFile = fileChooser.getSelectedFile().getAbsolutePath();
+                        String selectedFileOverlay = selectedFile.substring(0, selectedFile.length() - 4) + "_overlay.png";
+                        if (tileViewingType != 3 || new File(selectedFileOverlay).exists()) {
+                            switch (tileViewingType) {
+                                case 0:
+                                    texSimple.setImage2D(selectedFile, true);
+                                    break;
+                                case 1:
+                                    texSingleBorder.setImage2D(selectedFile, true);
+                                    break;
+                                case 2:
+                                    texConnected.setImage2D(selectedFile, true);
+                                    break;
+                                case 3:
+                                    texLargeRepeat.setImage2D(selectedFile, true);
+                                    texOverlay.setImage2D(selectedFileOverlay, true);
+                                    break;
+                            }
+                        }
+                    }
+                    Display.setFullscreen(true);
+                }
+                catch (Exception e) {
+                    System.err.println(e.getMessage());
+                    System.exit(-1);
+                }
+                shouldRebuild = true;
+                break;
             case Keyboard.KEY_1:
             case Keyboard.KEY_2:
             case Keyboard.KEY_3:
@@ -78,7 +121,6 @@ public class TileScreen extends SlideScreen {
      * 2 = Complex full connected texture system (Thornmite Overlay)
      * 3 = Random connected texture from Andreas/Georg
      */
-    private int tileViewingType = 0;
 
     @Override
     public void onEntry(GameTime gameTime) {
@@ -209,7 +251,7 @@ public class TileScreen extends SlideScreen {
                         break;
                     case 3:
                         uvr.x = (x % 16) / 16.0f;
-                        uvr.y = 1.0f - ((y % 16) / 16.0f);
+                        uvr.y = (y % 16) / 16.0f;
                         uvr.z = 1.0f / 16.0f;
                         uvr.w = 1.0f / 16.0f;
                         batch.draw(texLargeRepeat, uvr, position, size, Color.White, 0.0f);
