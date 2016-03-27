@@ -1,19 +1,18 @@
 package presentation;
 
 import blister.GameTime;
-import blister.input.KeyboardEventDispatcher;
-import blister.input.KeyboardKeyEventArgs;
-import blister.input.MouseWheelEventArgs;
+import blister.input.*;
 import egl.*;
-import egl.math.Color;
-import egl.math.Matrix4;
-import egl.math.Vector2;
-import egl.math.Vector4;
+import egl.math.*;
 import ext.csharp.ACEventFunc;
 import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.INTELMapTexture;
 import presentation.tiles.ConnectedTextureBuilder;
+
+import java.util.function.Function;
 
 /**
  *
@@ -47,8 +46,30 @@ public class TileScreen extends SlideScreen {
                 tileViewingType = args.key - Keyboard.KEY_1;
                 shouldRebuild = true;
                 break;
-
+            case Keyboard.KEY_R:
+                for (int i = 0; i < (TILES_X * TILES_Y); i++) tiles[i] = (Math.random() < 0.3) ? 0 : 1;
+                shouldRebuild = true;
+                break;
+            case Keyboard.KEY_F:
+                int i = 0;
+                for (int y = 0; y < TILES_Y; y++) {
+                    for (int x = 0; x < TILES_X; x++) {
+                        tiles[i++] = (y <= 2 || y >= TILES_Y - 3 || x <= 2 || x >= TILES_X - 3) ? 1 : 0;
+                    }
+                }
+                shouldRebuild = true;
+                break;
         }
+    };
+    private boolean addTile;
+    private boolean delTile;
+    private ACEventFunc<MouseButtonEventArgs> fMousePress = (sender, args) -> {
+        if (args.button == MouseButton.Left) delTile = true;
+        if (args.button == MouseButton.Right) addTile = true;
+    };
+    private ACEventFunc<MouseButtonEventArgs> fMouseRelease = (sender, args) -> {
+        if (args.button == MouseButton.Left) delTile = false;
+        if (args.button == MouseButton.Right) addTile = false;
     };
 
     /**
@@ -90,6 +111,10 @@ public class TileScreen extends SlideScreen {
         GL11.glClearDepth(1.0);
 
         KeyboardEventDispatcher.OnKeyPressed.add(fKeyPress);
+        MouseEventDispatcher.OnMousePress.add(fMousePress);
+        MouseEventDispatcher.OnMouseRelease.add(fMouseRelease);
+        addTile = false;
+        delTile = false;
         cameraController = new CameraController(game.getWidth(), game.getHeight());
         cameraController.start();
     }
@@ -99,6 +124,8 @@ public class TileScreen extends SlideScreen {
         super.onExit(gameTime);
 
         KeyboardEventDispatcher.OnKeyPressed.remove(fKeyPress);
+        MouseEventDispatcher.OnMousePress.remove(fMousePress);
+        MouseEventDispatcher.OnMouseRelease.remove(fMouseRelease);
 
         batch.dispose();
         batch = null;
@@ -120,6 +147,22 @@ public class TileScreen extends SlideScreen {
     @Override
     public void update(GameTime gameTime) {
         super.update(gameTime);
+
+
+        if ((addTile || delTile) && (addTile != delTile)) {
+            Vector3 pos = new Vector3(2 * Mouse.getX() / (float)game.getWidth() - 1, 2 * Mouse.getY() / (float)game.getHeight() - 1, 0);
+            Matrix4 mCamInv = new Matrix4(mCamera);
+            mCamInv.invert();
+            mCamInv.mulPos(pos);
+            if (pos.x >= 0 && pos.x < TILES_X && pos.y >= 0 && pos.y < TILES_Y) {
+                int toggleIndex = (int)pos.y * TILES_X + (int)pos.x;
+                int tileToSet = addTile ? 1 : 0;
+                if (tiles[toggleIndex] != tileToSet) {
+                    tiles[toggleIndex] = tileToSet;
+                    shouldRebuild = true;
+                }
+            }
+        }
 
         if (shouldRebuild) {
             shouldRebuild = false;
