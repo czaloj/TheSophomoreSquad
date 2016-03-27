@@ -36,6 +36,7 @@ public class TileScreen extends SlideScreen {
 
     private final Matrix4 mCamera = new Matrix4();
     private final Matrix4 mIdentity = new Matrix4();
+    private CameraController cameraController;
 
     private ACEventFunc<KeyboardKeyEventArgs> fKeyPress = (sender, args) -> {
         switch (args.key) {
@@ -89,6 +90,8 @@ public class TileScreen extends SlideScreen {
         GL11.glClearDepth(1.0);
 
         KeyboardEventDispatcher.OnKeyPressed.add(fKeyPress);
+        cameraController = new CameraController(game.getWidth(), game.getHeight());
+        cameraController.start();
     }
 
     @Override
@@ -109,6 +112,9 @@ public class TileScreen extends SlideScreen {
         texLargeRepeat = null;
         texOverlay.dispose();
         texOverlay = null;
+
+        cameraController.stop();
+        cameraController = null;
     }
 
     @Override
@@ -119,6 +125,8 @@ public class TileScreen extends SlideScreen {
             shouldRebuild = false;
             rebuildTiles();
         }
+
+        cameraController.update(mCamera);
     }
 
     @Override
