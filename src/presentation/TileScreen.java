@@ -217,7 +217,7 @@ public class TileScreen extends SlideScreen {
     @Override
     public void draw(GameTime gameTime) {
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
-        batch.renderBatch(mIdentity, mCamera, BlendState.ADDITIVE, SamplerState.POINT_WRAP, DepthState.NONE, RasterizerState.CULL_NONE);
+        batch.renderBatch(mIdentity, mCamera, BlendState.ALPHA_BLEND, SamplerState.POINT_WRAP, DepthState.NONE, RasterizerState.CULL_NONE);
         super.draw(gameTime);
     }
 
@@ -250,10 +250,12 @@ public class TileScreen extends SlideScreen {
                         batch.draw(tileViewingType == 1 ? texSingleBorder : texConnected, uvr, position, size, Color.White, 0.0f);
                         break;
                     case 3:
-                        uvr.x = (x % 16) / 16.0f;
-                        uvr.y = (y % 16) / 16.0f;
-                        uvr.z = 1.0f / 16.0f;
-                        uvr.w = 1.0f / 16.0f;
+                        float rw = 16.0f / (float)texLargeRepeat.getWidth();
+                        float rh = 16.0f / (float)texLargeRepeat.getHeight();
+                        uvr.x = (x % (texLargeRepeat.getWidth() / 16)) * rw;
+                        uvr.y = (y % (texLargeRepeat.getHeight() / 16)) * rh;
+                        uvr.z = rw;
+                        uvr.w = rh;
                         batch.draw(texLargeRepeat, uvr, position, size, Color.White, 0.0f);
                         uvr.x = (tileTextureIndices[i] % 12) / 12.0f;
                         uvr.y = (3 - (tileTextureIndices[i] / 12)) / 4.0f;
@@ -265,6 +267,6 @@ public class TileScreen extends SlideScreen {
                 i++;
             }
         }
-        batch.end(SpriteSortMode.BackToFront);
+        batch.end(SpriteSortMode.None);
     }
 }
