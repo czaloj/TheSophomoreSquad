@@ -16,6 +16,7 @@ public class PresentApp extends MainGame {
     @Override
     protected void buildScreenList() {
         screenList = new ScreenList(this, 0,
+            new LightningScreen("data/LightningImage.png"),
             new ImageSlideScreen("data/slides/Hi.png"),
             new TileScreen()
             );
