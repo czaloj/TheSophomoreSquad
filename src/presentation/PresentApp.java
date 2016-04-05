@@ -16,8 +16,22 @@ public class PresentApp extends MainGame {
     @Override
     protected void buildScreenList() {
         screenList = new ScreenList(this, 0,
+            new ImageSlideScreen("data/slides/wow_0.jpg"),
+            new ImageSlideScreen("data/slides/wow_1.jpg"),
+            new ImageSlideScreen("data/slides/wow_2.jpg"),
+            new ImageSlideScreen("data/slides/wow_3.jpg"),
+            new ImageSlideScreen("data/slides/gw2_0.jpg"),
+            new ImageSlideScreen("data/slides/gw2_1.jpg"),
+            new ImageSlideScreen("data/slides/gw2_2.jpg"),
+            new ImageSlideScreen("data/slides/wow_4.jpg"),
+            new ImageSlideScreen("data/slides/wow_5.jpg"),
+            new ImageSlideScreen("data/slides/wow_6.png"),
+            new ImageSlideScreen("data/slides/gw2_3.jpg"),
+            new ImageSlideScreen("data/slides/gw2_5.jpg"),
+            new ImageSlideScreen("data/slides/gw2_4.jpg"),
+            new ImageSlideScreen("data/slides/wow.jpg"),
+            new ImageSlideScreen("data/slides/gw2.jpg"),
             new LightningScreen("data/LightningImage.png"),
-            new ImageSlideScreen("data/slides/Hi.png"),
             new TileScreen()
             );
     }
